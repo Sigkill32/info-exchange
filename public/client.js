@@ -80,13 +80,6 @@ const createAndAppendMessage = (messages, source) => {
 
 const showStatus = (msg) => {
   let bar = document.getElementById("statusBar");
-  if (!bar) {
-    bar = document.createElement("p");
-    bar.id = "statusBar";
-    bar.style.cssText =
-      "margin:4px 0;font-size:0.8em;color:#888;text-align:center;";
-    document.querySelector(".chatScreen").prepend(bar);
-  }
   bar.textContent = msg;
 };
 
@@ -148,11 +141,6 @@ const onStartChat = () => {
   username = document.getElementById("username").value;
   targetusername = document.getElementById("targetusername").value;
   document.getElementById("targetUserNameTitle").textContent = targetusername;
-
-  const conversationContainer = document.querySelector(
-    ".chatScreen_conversationContainer",
-  );
-  conversationContainer.style.height = window.innerHeight * 0.7 + "px";
 
   document.querySelector(".chatScreen").classList.remove("hidden");
 

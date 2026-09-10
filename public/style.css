@@ -1,10 +1,37 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+}
+
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+.initScreen {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatScreen {
+    height: 100%;
+    margin: 0 10px;
 }
 
 .chatScreen_inputcontainer {
     margin-top: 10px;
     display: flex;
+    height: 5%;
     input {
         width: 80%;
     }
@@ -18,6 +45,7 @@
     border-top: solid;
     border-bottom: solid;
     padding: 10px;
+    height: 75%;
 }
 
 .chatScreen_conversationContainer_chatBubble {
@@ -43,4 +71,11 @@
 #targetUserNameTitle {
     width: 100%;
     text-align: center;
+}
+
+#statusBar {
+    margin:4px 0;
+    font-size:0.8em;
+    color:#888;
+    text-align:center;
 }
