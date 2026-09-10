@@ -1,0 +1,120 @@
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const { WebSocketServer, WebSocket } = require("ws");
+
+const HEARTBEAT_INTERVAL_MS = 30_000;
+
+const httpServer = http.createServer((req, res) => {
+    let filePath = req.url === "/" ? "/index.html" : req.url;
+    const fullPath = path.join(__dirname, "public", filePath);
+
+    const extname = path.extname(fullPath);
+    let contentType = "text/html";
+    switch (extname) {
+        case ".js":
+            contentType = "text/javascript";
+            break;
+        case ".css":
+            contentType = "text/css";
+            break;
+        case ".json":
+            contentType = "application/json";
+            break;
+    }
+
+    fs.readFile(fullPath, (error, content) => {
+        if (error) {
+            if (error.code === "ENOENT") {
+                res.writeHead(404, { "Content-Type": "text/html" });
+                res.end("<h1>404 Not Found</h1>", "utf-8");
+            } else {
+                res.writeHead(500);
+                res.end(`Server Error: ${error.code}`);
+            }
+        } else {
+            res.writeHead(200, { "Content-Type": contentType });
+            res.end(content, "utf-8");
+        }
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+const webSocketServer = new WebSocketServer({ server: httpServer });
+
+const connections = {};
+
+const queue = {};
+
+const heartbeatInterval = setInterval(() => {
+    webSocketServer.clients.forEach((ws) => {
+        if (!ws.isAlive) {
+            ws.terminate();
+            return;
+        }
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, HEARTBEAT_INTERVAL_MS);
+
+webSocketServer.on("close", () => clearInterval(heartbeatInterval));
+
+webSocketServer.on("connection", (ws, req) => {
+    console.log("connection opened", req.url);
+    ws.isAlive = true;
+    ws.on("pong", () => { ws.isAlive = true; });
+
+    const myUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+    const urlParams = myUrl.searchParams;
+    const username = urlParams.get("username");
+    const targetusername = urlParams.get("targetusername");
+
+    connections[username] = ws;
+    ws.username = username;
+    ws.targetusername = targetusername;
+
+    console.log("Connected user:", { username, targetusername });
+
+    if (username in queue) {
+        connections[username].send(JSON.stringify(queue[username].messages));
+        delete queue[username]
+    }
+
+    ws.on("message", (data) => {
+        const { targetusername, username } = ws;
+        let message;
+        try {
+            message = JSON.parse(data.toString("utf-8"));
+        } catch (e) {
+            message = data.toString("utf-8");
+        }
+        if (targetusername in connections) {
+            connections[targetusername].send(JSON.stringify([message]));
+            console.log({ targetusername, username, data: message });
+        } else {
+            if (targetusername in queue) {
+                queue[targetusername].messages.push(message);
+            } else {
+                queue[targetusername] = { source: ws.username, messages: [message] }
+            }
+
+            console.log(JSON.stringify(queue));
+        }
+
+        const notification = JSON.stringify({ type: "notification", from: username });
+        webSocketServer.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(notification);
+            }
+        });
+    });
+
+    ws.on("close", () => {
+        console.log(`Connection closed for user: ${username}`);
+        if (connections[username] === ws) {
+            delete connections[username];
+        }
+    });
+});

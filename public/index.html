@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Exchange</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="initScreen">
+        <input type="text" id="username" placeholder="Enter your username">
+        <input type="text" id="targetusername" placeholder="Enter receipent username">
+        <button id="startChatting">START CHATTING</button>
+    </div>
+
+    <div class="chatScreen hidden">
+        <h4 id="targetUserNameTitle"></h4>
+        <button id="enableNotifications">Enable Notifications</button>
+        <div class="chatScreen_conversationContainer">
+        </div>
+        <div class="chatScreen_inputcontainer">
+            <input type="text" id="message" placeholder="Enter your message">
+            <button id="sendMessage">SEND</button>
+        </div>
+    </div>
+    <script src="./client.js"></script>
+</body>
+
+</html>
