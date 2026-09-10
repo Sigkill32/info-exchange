@@ -5,6 +5,16 @@ let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 
+const generateTimeStamp = () => {
+  const date = new Date();
+  const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
+  const amPM = date.getHours() > 12 ? "pm" : "am";
+  const minutes =
+    date.getMinutes() > 9 ? date.getMinutes() : "0" + date.getMinutes();
+  const time = `${hours}:${minutes} ${amPM}`;
+  return time;
+};
+
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 let wsUri = `${wsProtocol}//${window.location.host}`;
 
@@ -31,14 +41,14 @@ enableNotificationsBtn.addEventListener("click", () => {
   Notification.requestPermission().then(updateNotificationButton);
 });
 
-const createChatBubble = (message, source) => {
+const createChatBubble = (message, source, timeStamp) => {
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
   const sourceElement = document.createElement("p");
   sourceElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_source",
   );
-  sourceElement.textContent = source;
+  sourceElement.textContent = `${source} [${timeStamp}]`;
   const mesageElement = document.createElement("p");
   mesageElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_message",
@@ -52,8 +62,14 @@ const createChatBubble = (message, source) => {
 const createAndAppendMessage = (messages, source) => {
   const messagesFragment = document.createDocumentFragment();
   messages.forEach((message) => {
-    const chatBubble = createChatBubble(message, source);
-    messagesFragment.appendChild(chatBubble);
+    if (message.type === "TEXT_MESSAGE") {
+      const chatBubble = createChatBubble(
+        message.message,
+        source,
+        message.timeStamp,
+      );
+      messagesFragment.appendChild(chatBubble);
+    }
   });
   const conversationContainer = document.querySelector(
     ".chatScreen_conversationContainer",
@@ -147,14 +163,20 @@ const handleSendMessage = () => {
   const messageInput = document.getElementById("message");
   const message = messageInput.value;
 
+  const userMessage = {
+    message: message,
+    timeStamp: generateTimeStamp(),
+    type: "TEXT_MESSAGE",
+  };
+
   if (!socket || socket.readyState !== WebSocket.OPEN) {
     alert("Cannot send message. You are currently offline.");
     return;
   }
 
   if (message.length > 0) {
-    socket.send(JSON.stringify(message));
-    createAndAppendMessage([message], username);
+    socket.send(JSON.stringify(userMessage));
+    createAndAppendMessage([userMessage], username);
     messageInput.value = "";
   }
 };
