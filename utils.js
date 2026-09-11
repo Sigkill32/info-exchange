@@ -19,7 +19,10 @@ const createMessages = (type, payload) => {
     }
 
     case "ONLINE_STATUS": {
-      return { ...payload, type: "ONLINE_STATUS" };
+      return {
+        ...payload,
+        type: "ONLINE_STATUS",
+      };
     }
   }
   return message;

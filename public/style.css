@@ -79,3 +79,15 @@ body {
     color:#888;
     text-align:center;
 }
+
+.chatScreen_targetUsernamecontainer {
+    display: flex;
+    align-items: center;
+}
+
+.chatScreen_targetUsernamecontainer_onlineStatus {
+    height: 5px;
+    width: 5px;
+    border: solid;
+    border-radius: 50%;
+}

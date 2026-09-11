@@ -80,6 +80,12 @@ webSocketServer.on("connection", (ws, req) => {
   ws.targetusername = targetusername;
 
   console.log("Connected user:", { username, targetusername });
+  const onlineStatusMessage = createMessages("ONLINE_STATUS", {
+    users: Object.keys(connections),
+  });
+  Object.values(connections).forEach((connection) =>
+    connection.send(JSON.stringify(onlineStatusMessage)),
+  );
 
   if (username in queue) {
     connections[username].send(JSON.stringify(queue[username].messages));
@@ -127,5 +133,11 @@ webSocketServer.on("connection", (ws, req) => {
     if (connections[username] === ws) {
       delete connections[username];
     }
+    const onlineStatusMessage = createMessages("ONLINE_STATUS", {
+      users: Object.keys(connections),
+    });
+    Object.values(connections).forEach((connection) =>
+      connection.send(JSON.stringify(onlineStatusMessage)),
+    );
   });
 });

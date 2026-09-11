@@ -83,6 +83,15 @@ const showStatus = (msg) => {
   bar.textContent = msg;
 };
 
+const setOnlineStatus = (data) => {
+  const targetUser = document.getElementById("targetUserNameTitle");
+  if (data.users.includes(targetusername)) {
+    targetUser.style.color = "green";
+  } else {
+    targetUser.style.color = "black";
+  }
+};
+
 const connectSocket = () => {
   if (reconnectTimer) {
     clearTimeout(reconnectTimer);
@@ -103,12 +112,19 @@ const connectSocket = () => {
       const data = JSON.parse(event.data);
       if (Array.isArray(data)) {
         createAndAppendMessage(data, targetusername);
-      } else if (
-        data.type === "notification" &&
-        Notification.permission === "granted" &&
-        document.hidden
-      ) {
-        new Notification(`New message from ${data.from}`);
+      } else {
+        switch (data.type) {
+          case "notification": {
+            if (Notification.permission == "granted" && document.hidden) {
+              new Notification(`New message from ${data.from}`);
+            }
+            break;
+          }
+          case "ONLINE_STATUS": {
+            setOnlineStatus(data);
+            break;
+          }
+        }
       }
     } catch (error) {
       console.error("Failed to parse incoming WebSocket message:", error);
