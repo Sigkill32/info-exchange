@@ -6,23 +6,26 @@ const { createMessages } = require("./utils");
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
 
+const DB_CONNECTION_STRING =
+  "postgresql://postgres:[YOUR-PASSWORD]@db.auvqcktzlzaznebilzqt.supabase.co:5432/postgres";
+
+const MIME_TYPES = {
+  ".html": "text/html",
+  ".css": "text/css",
+  ".js": "application/javascript",
+  ".json": "application/json",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+};
+
 const httpServer = http.createServer((req, res) => {
   let filePath = req.url === "/" ? "/index.html" : req.url;
   const fullPath = path.join(__dirname, "public", filePath);
 
   const extname = path.extname(fullPath);
-  let contentType = "text/html";
-  switch (extname) {
-    case ".js":
-      contentType = "text/javascript";
-      break;
-    case ".css":
-      contentType = "text/css";
-      break;
-    case ".json":
-      contentType = "application/json";
-      break;
-  }
+  let contentType = MIME_TYPES[extname];
 
   fs.readFile(fullPath, (error, content) => {
     if (error) {
