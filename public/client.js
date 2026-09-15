@@ -15,6 +15,29 @@ const generateTimeStamp = () => {
   return time;
 };
 
+const registerServiceWorker = () => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register("/sw.js", { scope: "/" })
+      .then((registration) => {
+        if (registration.installing) {
+          console.log("Installing service worker");
+        }
+        if (registration.waiting) {
+          console.log("waitin.....");
+        }
+        if (registration.active) {
+          console.log("service worker successfully installed");
+        }
+      })
+      .catch((error) => {
+        console.error("An error ocured during sw installation", error);
+      });
+  }
+};
+
+registerServiceWorker();
+
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 let wsUri = `${wsProtocol}//${window.location.host}`;
 
