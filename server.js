@@ -2,23 +2,13 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const { WebSocketServer, WebSocket } = require("ws");
-const { createMessages } = require("./utils");
-
-const HEARTBEAT_INTERVAL_MS = 30_000;
-
-const DB_CONNECTION_STRING =
-  "postgresql://postgres:[YOUR-PASSWORD]@db.auvqcktzlzaznebilzqt.supabase.co:5432/postgres";
-
-const MIME_TYPES = {
-  ".html": "text/html",
-  ".css": "text/css",
-  ".js": "application/javascript",
-  ".json": "application/json",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".svg": "image/svg+xml",
-  ".ico": "image/x-icon",
-};
+const { createMessages, tryCatchDecorator } = require("./utils");
+const {
+  HEARTBEAT_INTERVAL_MS,
+  MIME_TYPES,
+  STATUS_BIITS,
+} = require("./constants");
+const queryService = require("./queryService");
 
 const httpServer = http.createServer((req, res) => {
   let filePath = req.url === "/" ? "/index.html" : req.url;
@@ -81,6 +71,8 @@ webSocketServer.on("connection", (ws, req) => {
   connections[username] = ws;
   ws.username = username;
   ws.targetusername = targetusername;
+
+  queryService.createUserConnection(username, STATUS_BIITS.ONLINE);
 
   console.log("Connected user:", { username, targetusername });
   const onlineStatusMessage = createMessages("ONLINE_STATUS", {

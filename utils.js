@@ -28,4 +28,15 @@ const createMessages = (type, payload) => {
   return message;
 };
 
-module.exports = { generateTimeStamp, createMessages };
+const tryCatchDecorator = (fn, onDone) => {
+  return async (...args) => {
+    try {
+      const result = await fn(...args);
+      onDone(null, result);
+    } catch (error) {
+      onDone(error);
+    }
+  };
+};
+
+module.exports = { generateTimeStamp, createMessages, tryCatchDecorator };
