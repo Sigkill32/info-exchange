@@ -6,7 +6,7 @@ const { createMessages, tryCatchDecorator } = require("./utils");
 const {
   HEARTBEAT_INTERVAL_MS,
   MIME_TYPES,
-  STATUS_BIITS,
+  STATUS_BITS,
 } = require("./constants");
 const queryService = require("./queryService");
 
@@ -72,9 +72,8 @@ webSocketServer.on("connection", (ws, req) => {
   ws.username = username;
   ws.targetusername = targetusername;
 
-  queryService.createUserConnection(username, STATUS_BIITS.ONLINE);
-
   console.log("Connected user:", { username, targetusername });
+
   const onlineStatusMessage = createMessages("ONLINE_STATUS", {
     users: Object.keys(connections),
   });

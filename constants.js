@@ -11,9 +11,9 @@ const MIME_TYPES = {
   ".ico": "image/x-icon",
 };
 
-const STATUS_BIITS = {
+const STATUS_BITS = {
   ONLINE: 1,
   OFFLINE: 0,
 };
 
-module.exports = { HEARTBEAT_INTERVAL_MS, MIME_TYPES, STATUS_BIITS };
+module.exports = { HEARTBEAT_INTERVAL_MS, MIME_TYPES, STATUS_BITS };

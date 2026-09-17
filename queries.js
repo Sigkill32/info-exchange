@@ -8,7 +8,7 @@ const getUserConnection = async (username) => {
 
 const createUserConnection = async (username, status) => {
   const queryText =
-    "INSERT INTO connections (username, status) VALUES ($1, $2) RETURNING *";
+    "INSERT INTO connections (username, status) VALUES ($1, $2) ON CONFLICT (username) DO UPDATE SET status = $2 RETURNING *";
   const { rows } = await db.query(queryText, [username, status]);
   return rows[0];
 };
@@ -20,8 +20,16 @@ const updateMessage = async (source, destination, message) => {
   return rows[0];
 };
 
+const getUserMessages = async (username) => {
+  const queryText =
+    "SELECT source_username, message, created_at FROM messages WHERE destination_username = $1";
+  const { rows } = await db.query(queryText, [username]);
+  return rows[0];
+};
+
 module.exports = {
   getUserConnection,
   createUserConnection,
   updateMessage,
+  getUserMessages,
 };
