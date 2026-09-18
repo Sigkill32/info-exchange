@@ -21,4 +21,6 @@ module.exports = {
   updateMessage: (source, destination, message) =>
     handleQuery(queries.updateMessage(source, destination, message)),
   getUserMessages: (username) => queries.getUserMessages(username),
+  updateMessagesBulk: (source, destination, message) =>
+    handleQuery(queries.updateMessagesBulk(source, destination, message)),
 };
