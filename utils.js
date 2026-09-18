@@ -39,4 +39,19 @@ const tryCatchDecorator = (fn, onDone) => {
   };
 };
 
-module.exports = { generateTimeStamp, createMessages, tryCatchDecorator };
+const debounceDecorator = (fn) => {
+  let timer = null;
+  return function (...args) {
+    clearInterval(timer);
+    timer = setTimeout(() => {
+      fn(...args);
+    }, 2000);
+  };
+};
+
+module.exports = {
+  generateTimeStamp,
+  createMessages,
+  tryCatchDecorator,
+  debounceDecorator,
+};
