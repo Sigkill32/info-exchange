@@ -27,9 +27,33 @@ const getUserMessages = async (username) => {
   return rows[0];
 };
 
+const updateMessagesBulk = async (messagesArray) => {
+  if (!messagesArray || messagesArray.length === 0) return [];
+
+  const values = [];
+  const valuePlaceholders = [];
+  let index = 1;
+
+  for (const msg of messagesArray) {
+    valuePlaceholders.push(`($${index}, $${index + 1}, $${index + 2})`);
+    values.push(msg.source, msg.destination, msg.message);
+    index += 3;
+  }
+
+  const queryText = `
+    INSERT INTO messages (source_username, destination_username, message) 
+    VALUES ${valuePlaceholders.join(", ")} 
+    RETURNING *;
+  `;
+
+  const { rows } = await db.query(queryText, values);
+  return rows;
+};
+
 module.exports = {
   getUserConnection,
   createUserConnection,
   updateMessage,
   getUserMessages,
+  updateMessagesBulk,
 };
