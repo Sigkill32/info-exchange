@@ -3,11 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { WebSocketServer, WebSocket } = require("ws");
 const { createMessages, tryCatchDecorator } = require("./utils");
-const {
-  HEARTBEAT_INTERVAL_MS,
-  MIME_TYPES,
-  STATUS_BITS,
-} = require("./constants");
+const { HEARTBEAT_INTERVAL_MS, MIME_TYPES } = require("./constants");
 const queryService = require("./queryService");
 
 const httpServer = http.createServer((req, res) => {
@@ -54,6 +50,21 @@ const heartbeatInterval = setInterval(() => {
   });
 }, HEARTBEAT_INTERVAL_MS);
 
+const updateQueue = (type, targetusername, userMessage) => {
+  if (type === "DELETE") {
+    delete queue[targetusername];
+    return;
+  }
+  if (targetusername in queue) {
+    queue[targetusername].messages.push(userMessage);
+  } else {
+    queue[targetusername] = {
+      source: ws.username,
+      messages: [userMessage],
+    };
+  }
+};
+
 webSocketServer.on("close", () => clearInterval(heartbeatInterval));
 
 webSocketServer.on("connection", (ws, req) => {
@@ -84,6 +95,7 @@ webSocketServer.on("connection", (ws, req) => {
   if (username in queue) {
     connections[username].send(JSON.stringify(queue[username].messages));
     delete queue[username];
+    updateQueue("DELETE", username);
   }
 
   ws.on("message", (data) => {
@@ -99,15 +111,7 @@ webSocketServer.on("connection", (ws, req) => {
       connections[targetusername].send(JSON.stringify([userMessage]));
       console.log({ targetusername, username, data: message });
     } else {
-      if (targetusername in queue) {
-        queue[targetusername].messages.push(userMessage);
-      } else {
-        queue[targetusername] = {
-          source: ws.username,
-          messages: [userMessage],
-        };
-      }
-
+      updateQueue("UPDATE", targetusername, userMessage);
       console.log(JSON.stringify(queue));
     }
 
