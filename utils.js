@@ -14,7 +14,7 @@ const createMessages = (type, payload) => {
       return {
         ...payload,
         type: "TEXT_MESSAGE",
-        timeStamp: generateTimeStamp(),
+        created_at: generateTimeStamp(),
       };
     }
 

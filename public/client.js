@@ -64,14 +64,14 @@ enableNotificationsBtn.addEventListener("click", () => {
   Notification.requestPermission().then(updateNotificationButton);
 });
 
-const createChatBubble = (message, source, timeStamp) => {
+const createChatBubble = (message, source, created_at) => {
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
   const sourceElement = document.createElement("p");
   sourceElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_source",
   );
-  sourceElement.textContent = `${source} [${timeStamp}]`;
+  sourceElement.textContent = `${source} [${created_at}]`;
   const mesageElement = document.createElement("p");
   mesageElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_message",
@@ -83,16 +83,15 @@ const createChatBubble = (message, source, timeStamp) => {
 };
 
 const createAndAppendMessage = (messages, source) => {
+  // if a messages are of type array then they ARE text messages
   const messagesFragment = document.createDocumentFragment();
   messages.forEach((message) => {
-    if (message.type === "TEXT_MESSAGE") {
-      const chatBubble = createChatBubble(
-        message.message,
-        source,
-        message.timeStamp,
-      );
-      messagesFragment.appendChild(chatBubble);
-    }
+    const chatBubble = createChatBubble(
+      message.message,
+      source,
+      message.created_at,
+    );
+    messagesFragment.appendChild(chatBubble);
   });
   const conversationContainer = document.querySelector(
     ".chatScreen_conversationContainer",
@@ -192,7 +191,7 @@ const handleSendMessage = () => {
 
   const userMessage = {
     message: message,
-    timeStamp: generateTimeStamp(),
+    created_at: generateTimeStamp(),
     type: "TEXT_MESSAGE",
   };
 

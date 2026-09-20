@@ -102,6 +102,12 @@ webSocketServer.on("connection", (ws, req) => {
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
 
+  queryService.getUserMessages(username).then((data) => {
+    const [error, messages] = data;
+    if (error) console.log("Error while fetching data: ", error);
+    ws.send(JSON.stringify(messages));
+  });
+
   queryService
     .createUserConnection(username, 1)
     .then(() => {

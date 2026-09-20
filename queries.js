@@ -24,7 +24,7 @@ const getUserMessages = async (username) => {
   const queryText =
     "SELECT source_username, message, created_at FROM messages WHERE destination_username = $1";
   const { rows } = await db.query(queryText, [username]);
-  return rows[0];
+  return rows;
 };
 
 const updateMessagesBulk = async (messagesArray) => {
