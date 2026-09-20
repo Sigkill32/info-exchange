@@ -28,7 +28,6 @@ const getUserMessages = async (username) => {
 };
 
 const updateMessagesBulk = async (messagesArray) => {
-  console.log("message ARR::::", JSON.stringify(messagesArray));
   if (!messagesArray || messagesArray.length === 0) return [];
 
   const values = [];

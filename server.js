@@ -58,10 +58,6 @@ async function flushQueueToDatabase() {
   const batchToWrite = [...dbWriteQueue];
   dbWriteQueue = [];
 
-  console.log(
-    `[DB Flush] Writing a batch of ${batchToWrite.length} messages to PostgreSQL...`,
-  );
-
   try {
     await queryService.updateMessagesBulk(batchToWrite);
     console.log(`[DB Flush] Successfully committed batch.`);
