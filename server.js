@@ -102,6 +102,19 @@ webSocketServer.on("connection", (ws, req) => {
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
 
+  queryService
+    .createUserConnection(username, 1)
+    .then(() => {
+      console.log(
+        "[connection DB] write connection status of " + username + "to DB",
+      );
+    })
+    .catch((err) =>
+      console.log(
+        "[connection DB] failed to write" + username + " connection to DB",
+      ),
+    );
+
   connections[username] = ws;
   ws.username = username;
   ws.targetusername = targetusername;
@@ -144,6 +157,18 @@ webSocketServer.on("connection", (ws, req) => {
 
   ws.on("close", () => {
     console.log(`Connection closed for user: ${username}`);
+    queryService
+      .createUserConnection(username, 0)
+      .then(() => {
+        console.log(
+          "[connection DB] write connection status of " + username + "to DB",
+        );
+      })
+      .catch((err) =>
+        console.log(
+          "[connection DB] failed to write" + username + " connection to DB",
+        ),
+      );
     if (connections[username] === ws) {
       delete connections[username];
     }
