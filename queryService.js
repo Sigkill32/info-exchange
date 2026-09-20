@@ -23,4 +23,6 @@ module.exports = {
   getUserMessages: (username) => handleQuery(queries.getUserMessages, username),
   updateMessagesBulk: (messageArray) =>
     handleQuery(queries.updateMessagesBulk, messageArray),
+  deleteUserMessages: (username) =>
+    handleQuery(queries.deleteUserMessages, username),
 };

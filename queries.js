@@ -27,6 +27,12 @@ const getUserMessages = async (username) => {
   return rows;
 };
 
+const deleteUserMessages = async (username) => {
+  const queryText = "DELETE FROM messages WHERE destination_username = $1";
+  const { rows } = await db.query(queryText, [username]);
+  return rows;
+};
+
 const updateMessagesBulk = async (messagesArray) => {
   if (!messagesArray || messagesArray.length === 0) return [];
 
@@ -56,4 +62,5 @@ module.exports = {
   updateMessage,
   getUserMessages,
   updateMessagesBulk,
+  deleteUserMessages,
 };
