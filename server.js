@@ -109,8 +109,6 @@ webSocketServer.on("connection", (ws, req) => {
       console.log("Error while fetching data: ", error);
     }
     ws.send(JSON.stringify(messages));
-    // delete messages from db once the user has seen em
-    queryService.deleteUserMessages(username);
   });
 
   queryService
@@ -148,11 +146,11 @@ webSocketServer.on("connection", (ws, req) => {
       message = data.toString("utf-8");
     }
     const userMessage = createMessages("TEXT_MESSAGE", message);
+
+    updateQueue(username, targetusername, message);
+
     if (targetusername in connections) {
       connections[targetusername].send(JSON.stringify([userMessage]));
-      console.log({ targetusername, username, data: message });
-    } else {
-      updateQueue(username, targetusername, message);
     }
 
     const notification = JSON.stringify({
