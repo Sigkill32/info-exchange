@@ -208,6 +208,14 @@ const handleSendMessage = () => {
   }
 };
 
+document
+  .querySelector(".chatScreen_inputcontainer")
+  .addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      handleSendMessage();
+    }
+  });
+
 sendMessage.addEventListener("click", handleSendMessage);
 
 startChatting.addEventListener("click", onStartChat);

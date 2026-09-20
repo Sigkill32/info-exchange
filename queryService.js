@@ -20,7 +20,7 @@ module.exports = {
     handleQuery(queries.createUserConnection, username, status),
   updateMessage: (source, destination, message) =>
     handleQuery(queries.updateMessage(source, destination, message)),
-  getUserMessages: (username) => queries.getUserMessages(username),
-  updateMessagesBulk: (source, destination, message) =>
-    handleQuery(queries.updateMessagesBulk(source, destination, message)),
+  getUserMessages: (username) => handleQuery(queries.getUserMessages(username)),
+  updateMessagesBulk: (messageArray) =>
+    handleQuery(queries.updateMessagesBulk, messageArray),
 };

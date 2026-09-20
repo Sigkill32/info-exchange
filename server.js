@@ -2,7 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const { WebSocketServer, WebSocket } = require("ws");
-const { createMessages, tryCatchDecorator } = require("./utils");
+const { createMessages } = require("./utils");
 const { HEARTBEAT_INTERVAL_MS, MIME_TYPES } = require("./constants");
 const queryService = require("./queryService");
 
@@ -37,7 +37,7 @@ httpServer.listen(PORT, () =>
 const webSocketServer = new WebSocketServer({ server: httpServer });
 
 const connections = {};
-const queue = {};
+let dbWriteQueue = [];
 
 const heartbeatInterval = setInterval(() => {
   webSocketServer.clients.forEach((ws) => {
@@ -50,22 +50,49 @@ const heartbeatInterval = setInterval(() => {
   });
 }, HEARTBEAT_INTERVAL_MS);
 
-const updateQueue = (type, targetusername, userMessage) => {
-  if (type === "DELETE") {
-    delete queue[targetusername];
-    return;
+async function flushQueueToDatabase() {
+  if (dbWriteQueue.length === 0) return;
+
+  console.log({ dbWriteQueue });
+
+  const batchToWrite = [...dbWriteQueue];
+  dbWriteQueue = [];
+
+  console.log(
+    `[DB Flush] Writing a batch of ${batchToWrite.length} messages to PostgreSQL...`,
+  );
+
+  try {
+    await queryService.updateMessagesBulk(batchToWrite);
+    console.log(`[DB Flush] Successfully committed batch.`);
+  } catch (error) {
+    console.error(
+      "[DB Flush] Failed to write batch to database. Restoring queue items.",
+      error,
+    );
+    dbWriteQueue = [...batchToWrite, ...dbWriteQueue];
   }
-  if (targetusername in queue) {
-    queue[targetusername].messages.push(userMessage);
-  } else {
-    queue[targetusername] = {
-      source: ws.username,
-      messages: [userMessage],
-    };
+}
+
+const FLUSH_INTERVAL_MS = 3000;
+const dbFlushInterval = setInterval(flushQueueToDatabase, FLUSH_INTERVAL_MS);
+
+webSocketServer.on("close", () => {
+  clearInterval(heartbeatInterval);
+  clearInterval(dbFlushInterval);
+});
+
+const updateQueue = (source, destination, userMessage) => {
+  dbWriteQueue.push({
+    source: source,
+    destination: destination,
+    message: userMessage.message,
+  });
+
+  if (dbWriteQueue.length >= 100) {
+    flushQueueToDatabase();
   }
 };
-
-webSocketServer.on("close", () => clearInterval(heartbeatInterval));
 
 webSocketServer.on("connection", (ws, req) => {
   console.log("connection opened", req.url);
@@ -92,12 +119,6 @@ webSocketServer.on("connection", (ws, req) => {
     connection.send(JSON.stringify(onlineStatusMessage)),
   );
 
-  if (username in queue) {
-    connections[username].send(JSON.stringify(queue[username].messages));
-    delete queue[username];
-    updateQueue("DELETE", username);
-  }
-
   ws.on("message", (data) => {
     const { targetusername, username } = ws;
     let message;
@@ -111,8 +132,7 @@ webSocketServer.on("connection", (ws, req) => {
       connections[targetusername].send(JSON.stringify([userMessage]));
       console.log({ targetusername, username, data: message });
     } else {
-      updateQueue("UPDATE", targetusername, userMessage);
-      console.log(JSON.stringify(queue));
+      updateQueue(username, targetusername, message);
     }
 
     const notification = JSON.stringify({
