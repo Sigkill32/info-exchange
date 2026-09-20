@@ -84,7 +84,7 @@ const createChatBubble = (message, source, created_at) => {
 
 const createAndAppendMessage = (messages, source) => {
   // if a messages are of type array then they ARE text messages
-  document.querySelector(".chatScreen").classList.remove("chatLoading");
+  document.body.classList.remove("chatLoading");
   if (!messages.length) return;
   const messagesFragment = document.createDocumentFragment();
   messages.forEach((message) => {
@@ -183,8 +183,8 @@ const onStartChat = () => {
   document.getElementById("targetUserNameTitle").textContent = targetusername;
 
   document.querySelector(".chatScreen").classList.remove("hidden");
-
   connectSocket();
+  document.body.classList.add("chatLoading");
 };
 
 const handleSendMessage = () => {
