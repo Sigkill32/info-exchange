@@ -104,7 +104,10 @@ webSocketServer.on("connection", (ws, req) => {
 
   queryService.getUserMessages(username).then((data) => {
     const [error, messages] = data;
-    if (error) console.log("Error while fetching data: ", error);
+    if (error) {
+      ws.send(JSON.stringify([]));
+      console.log("Error while fetching data: ", error);
+    }
     ws.send(JSON.stringify(messages));
     // delete messages from db once the user has seen em
     queryService.deleteUserMessages(username);

@@ -84,6 +84,8 @@ const createChatBubble = (message, source, created_at) => {
 
 const createAndAppendMessage = (messages, source) => {
   // if a messages are of type array then they ARE text messages
+  document.querySelector(".chatScreen").classList.remove("chatLoading");
+  if (!message.length) return;
   const messagesFragment = document.createDocumentFragment();
   messages.forEach((message) => {
     const chatBubble = createChatBubble(

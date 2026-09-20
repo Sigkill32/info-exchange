@@ -91,3 +91,7 @@ body {
     border: solid;
     border-radius: 50%;
 }
+
+.chatLoading {
+    background-color: gray;   
+}
