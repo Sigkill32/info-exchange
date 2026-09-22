@@ -56,8 +56,8 @@ body {
     position: relative;
     margin-bottom: 10px;
     display: inline-block;
-    max-width: 80%;
-    min-width: 50%
+    max-width: 90%;
+    min-width: 60%
 }
 
 .chatScreen_conversationContainer_chatBubble_source {
