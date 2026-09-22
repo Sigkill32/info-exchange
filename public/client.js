@@ -199,13 +199,13 @@ const handleSendMessage = () => {
     destination_username: targetusername,
   };
 
-  // if (!socket || socket.readyState !== WebSocket.OPEN) {
-  //   alert("Cannot send message. You are currently offline.");
-  //   return;
-  // }
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    alert("Cannot send message. You are currently offline.");
+    return;
+  }
 
   if (message.length > 0) {
-    // socket.send(JSON.stringify(message));
+    socket.send(JSON.stringify(message));
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
   }

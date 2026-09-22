@@ -110,16 +110,6 @@ webSocketServer.on("connection", (ws, req) => {
     }
   });
 
-  // queryService.getUserMessages(username).then((data) => {
-  //   const [error, messages] = data;
-  //   if (error) {
-  //     ws.send(JSON.stringify([]));
-  //     console.log("Error while fetching data: ", error);
-  //   } else {
-  //     ws.send(JSON.stringify(messages));
-  //   }
-  // });
-
   queryService
     .createUserConnection(username, 1)
     .then(() => {
