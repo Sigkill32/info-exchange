@@ -64,14 +64,16 @@ enableNotificationsBtn.addEventListener("click", () => {
   Notification.requestPermission().then(updateNotificationButton);
 });
 
-const createChatBubble = (message, source, created_at) => {
+const createChatBubble = (messageObj) => {
+  const { source_username, destination_username, message, created_at } =
+    messageObj;
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
   const sourceElement = document.createElement("p");
   sourceElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_source",
   );
-  sourceElement.textContent = `${source} [${created_at}]`;
+  sourceElement.textContent = `${source_username} [${created_at}]`;
   const mesageElement = document.createElement("p");
   mesageElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_message",
@@ -82,17 +84,13 @@ const createChatBubble = (message, source, created_at) => {
   return chatBubble;
 };
 
-const createAndAppendMessage = (messages, source) => {
+const createAndAppendMessage = (messages) => {
   // if a messages are of type array then they ARE text messages
   document.querySelector(".loadingOverlay").classList.add("hidden");
   if (!messages.length) return;
   const messagesFragment = document.createDocumentFragment();
   messages.forEach((message) => {
-    const chatBubble = createChatBubble(
-      message.message,
-      source,
-      message.created_at,
-    );
+    const chatBubble = createChatBubble(message);
     messagesFragment.appendChild(chatBubble);
   });
   const conversationContainer = document.querySelector(
@@ -135,7 +133,7 @@ const connectSocket = () => {
     try {
       const data = JSON.parse(event.data);
       if (Array.isArray(data)) {
-        createAndAppendMessage(data, targetusername);
+        createAndAppendMessage(data);
       } else {
         switch (data.type) {
           case "notification": {
@@ -194,7 +192,8 @@ const handleSendMessage = () => {
   const userMessage = {
     message: message,
     created_at: generateTimeStamp(),
-    type: "TEXT_MESSAGE",
+    source_username: username,
+    destination_username: targetusername,
   };
 
   if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -203,8 +202,8 @@ const handleSendMessage = () => {
   }
 
   if (message.length > 0) {
-    socket.send(JSON.stringify(userMessage));
-    createAndAppendMessage([userMessage], username);
+    socket.send(JSON.stringify(message));
+    createAndAppendMessage([userMessage]);
     messageInput.value = "";
   }
 };

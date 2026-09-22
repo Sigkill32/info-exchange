@@ -53,8 +53,6 @@ const heartbeatInterval = setInterval(() => {
 async function flushQueueToDatabase() {
   if (dbWriteQueue.length === 0) return;
 
-  console.log({ dbWriteQueue });
-
   const batchToWrite = [...dbWriteQueue];
   dbWriteQueue = [];
 
@@ -78,11 +76,11 @@ webSocketServer.on("close", () => {
   clearInterval(dbFlushInterval);
 });
 
-const updateQueue = (source, destination, userMessage) => {
+const updateQueue = (source, destination, message) => {
   dbWriteQueue.push({
     source: source,
     destination: destination,
-    message: userMessage.message,
+    message: message,
   });
 
   if (dbWriteQueue.length >= 100) {
@@ -102,14 +100,25 @@ webSocketServer.on("connection", (ws, req) => {
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
 
-  queryService.getUserMessages(username).then((data) => {
+  queryService.getFullConversation(username, targetusername).then((data) => {
     const [error, messages] = data;
     if (error) {
+      console.log("Error fetching full conversation:", error);
       ws.send(JSON.stringify([]));
-      console.log("Error while fetching data: ", error);
+    } else {
+      ws.send(JSON.stringify(messages));
     }
-    ws.send(JSON.stringify(messages));
   });
+
+  // queryService.getUserMessages(username).then((data) => {
+  //   const [error, messages] = data;
+  //   if (error) {
+  //     ws.send(JSON.stringify([]));
+  //     console.log("Error while fetching data: ", error);
+  //   } else {
+  //     ws.send(JSON.stringify(messages));
+  //   }
+  // });
 
   queryService
     .createUserConnection(username, 1)
@@ -145,7 +154,11 @@ webSocketServer.on("connection", (ws, req) => {
     } catch (e) {
       message = data.toString("utf-8");
     }
-    const userMessage = createMessages("TEXT_MESSAGE", message);
+    const userMessage = createMessages("TEXT_MESSAGE", {
+      message,
+      source_username: username,
+      destination_username: targetusername,
+    });
 
     updateQueue(username, targetusername, message);
 

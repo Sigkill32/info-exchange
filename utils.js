@@ -13,7 +13,6 @@ const createMessages = (type, payload) => {
     case "TEXT_MESSAGE": {
       return {
         ...payload,
-        type: "TEXT_MESSAGE",
         created_at: generateTimeStamp(),
       };
     }

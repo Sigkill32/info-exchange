@@ -20,7 +20,14 @@ const updateMessage = async (source, destination, message) => {
   return rows[0];
 };
 
-const getUserMessages = async (username) => {
+const getFullConversation = async (username, destination) => {
+  const queryText =
+    "select * from messages where created_at in (select created_at from messages where source_username = $1 or destination_username = $2 or source_username = $2 or destination_username = $1 order by created_at desc limit 200) order by created_at asc";
+  const { rows } = await db.query(queryText, [username, destination]);
+  return rows;
+};
+
+const getUserMessages = async (username, destination) => {
   const queryText =
     "SELECT source_username, message, created_at FROM messages WHERE destination_username = $1";
   const { rows } = await db.query(queryText, [username]);
@@ -63,4 +70,5 @@ module.exports = {
   getUserMessages,
   updateMessagesBulk,
   deleteUserMessages,
+  getFullConversation,
 };
