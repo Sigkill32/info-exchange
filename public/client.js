@@ -65,8 +65,10 @@ enableNotificationsBtn.addEventListener("click", () => {
 });
 
 const createChatBubble = (messageObj) => {
-  const { source_username, destination_username, message, created_at } =
-    messageObj;
+  const { source_username, message, created_at } = messageObj;
+  const chatItem = document.createElement("div");
+  chatItem.classList.add("chatScreen_conversationContainer_chatItem");
+  if (source_username != username) chatItem.classList.add("chat_flexEnd");
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
   const sourceElement = document.createElement("p");
@@ -81,7 +83,8 @@ const createChatBubble = (messageObj) => {
   mesageElement.textContent = message;
   chatBubble.appendChild(sourceElement);
   chatBubble.appendChild(mesageElement);
-  return chatBubble;
+  chatItem.appendChild(chatBubble);
+  return chatItem;
 };
 
 const createAndAppendMessage = (messages) => {
@@ -196,13 +199,13 @@ const handleSendMessage = () => {
     destination_username: targetusername,
   };
 
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    alert("Cannot send message. You are currently offline.");
-    return;
-  }
+  // if (!socket || socket.readyState !== WebSocket.OPEN) {
+  //   alert("Cannot send message. You are currently offline.");
+  //   return;
+  // }
 
   if (message.length > 0) {
-    socket.send(JSON.stringify(message));
+    // socket.send(JSON.stringify(message));
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
   }

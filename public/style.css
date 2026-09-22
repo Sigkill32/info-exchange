@@ -55,6 +55,9 @@ body {
     border-radius: 5px;
     position: relative;
     margin-bottom: 10px;
+    display: inline-block;
+    max-width: 80%;
+    min-width: 18%
 }
 
 .chatScreen_conversationContainer_chatBubble_source {
@@ -107,4 +110,12 @@ body {
     background-color: grey;
     color: #ffffff;
     font-size: 2rem;
+}
+
+.chatScreen_conversationContainer_chatItem {
+    display: flex;
+}
+
+.chat_flexEnd {
+    justify-content: flex-end;
 }
