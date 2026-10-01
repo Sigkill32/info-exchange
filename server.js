@@ -11,8 +11,9 @@ const webPush = require("web-push");
 
 // Generate these once using: npx web-push generate-vapid-keys
 const vapidKeys = {
-  publicKey: "YOUR_PUBLIC_VAPID_KEY",
-  privateKey: "YOUR_PRIVATE_VAPID_KEY",
+  publicKey:
+    "BFt9r3dkn7CPXsAOLlPiRFc1jpTmq4WKhs9vjKwOLqlDQNm8Ix2CUPVZLXYESYhY9PgU41egCwOvQKuGwhY7NPo",
+  privateKey: "EsZLixs1SnUQOWrBYM4Dy0lIzsyXkD517wjHqf7MuGU",
 };
 
 webPush.setVapidDetails(

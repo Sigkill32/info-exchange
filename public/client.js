@@ -6,7 +6,8 @@ let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
-const PUBLIC_VAPID_KEY = "YOUR_PUBLIC_VAPID_KEY";
+const PUBLIC_VAPID_KEY =
+  "BFt9r3dkn7CPXsAOLlPiRFc1jpTmq4WKhs9vjKwOLqlDQNm8Ix2CUPVZLXYESYhY9PgU41egCwOvQKuGwhY7NPo";
 
 // Helper function needed to convert base64 VAPID key to UInt8Array for the browser
 const urlBase64ToUint8Array = (base64String) => {
