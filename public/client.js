@@ -5,6 +5,23 @@ let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 
+// ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
+const PUBLIC_VAPID_KEY = "YOUR_PUBLIC_VAPID_KEY";
+
+// Helper function needed to convert base64 VAPID key to UInt8Array for the browser
+const urlBase64ToUint8Array = (base64String) => {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+};
+
 const generateTimeStamp = () => {
   const date = new Date();
   const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
@@ -20,15 +37,10 @@ const registerServiceWorker = () => {
     navigator.serviceWorker
       .register("/sw.js", { scope: "/" })
       .then((registration) => {
-        if (registration.installing) {
-          console.log("Installing service worker");
-        }
-        if (registration.waiting) {
-          console.log("waitin.....");
-        }
-        if (registration.active) {
+        if (registration.installing) console.log("Installing service worker");
+        if (registration.waiting) console.log("waitin.....");
+        if (registration.active)
           console.log("service worker successfully installed");
-        }
       })
       .catch((error) => {
         console.error("An error ocured during sw installation", error);
@@ -60,8 +72,53 @@ const updateNotificationButton = () => {
   }
 };
 
+// NEW: Generates push registration tokens and updates backend routing mappings
+const configurePushSubscription = async (user) => {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+
+    // Check if an active subscription token already exists
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      // Create a fresh subscription channel linked directly to your VAPID key
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+      });
+    }
+
+    // Deliver subscription credentials safely over HTTP to your node.js server
+    await fetch("/api/save-subscription", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: user,
+        subscription: subscription,
+      }),
+    });
+    console.log(
+      "[Push Client] Subscription successfully sent to backend mapping.",
+    );
+  } catch (error) {
+    console.error(
+      "[Push Client] Failed to register subscription channel:",
+      error,
+    );
+  }
+};
+
 enableNotificationsBtn.addEventListener("click", () => {
-  Notification.requestPermission().then(updateNotificationButton);
+  Notification.requestPermission().then((permission) => {
+    updateNotificationButton();
+    // If the user logs in first, then hits allow notifications, immediately sync
+    if (permission === "granted" && username) {
+      configurePushSubscription(username);
+    }
+  });
 });
 
 const createChatBubble = (messageObj) => {
@@ -88,7 +145,6 @@ const createChatBubble = (messageObj) => {
 };
 
 const createAndAppendMessage = (messages) => {
-  // if a messages are of type array then they ARE text messages
   document.querySelector(".loadingOverlay").classList.add("hidden");
   if (!messages.length) return;
   const messagesFragment = document.createDocumentFragment();
@@ -140,6 +196,7 @@ const connectSocket = () => {
       } else {
         switch (data.type) {
           case "notification": {
+            // Keep this logic for fallback notifications when app is active but tab is backgrounded
             if (Notification.permission == "granted" && document.hidden) {
               new Notification(`New message from ${data.from}`);
             }
@@ -156,9 +213,7 @@ const connectSocket = () => {
     }
   };
 
-  socket.onerror = () => {
-    // onclose fires right after; handle reconnect there
-  };
+  socket.onerror = () => {};
 
   socket.onclose = (event) => {
     if (event.wasClean) {
@@ -184,6 +239,10 @@ const onStartChat = () => {
   document.getElementById("targetUserNameTitle").textContent = targetusername;
 
   document.querySelector(".chatScreen").classList.remove("hidden");
+
+  // TRIGGER SUBSCRIPTION LINKING AS SOON AS USER LOGS IN
+  configurePushSubscription(username);
+
   connectSocket();
   document.querySelector(".loadingOverlay").classList.remove("hidden");
 };
@@ -220,5 +279,6 @@ document
   });
 
 sendMessage.addEventListener("click", handleSendMessage);
-
 startChatting.addEventListener("click", onStartChat);
+// Initialize button UI state on startup
+updateNotificationButton();
