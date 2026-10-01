@@ -144,6 +144,7 @@ webSocketServer.on("connection", (ws, req) => {
   const urlParams = myUrl.searchParams;
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
+  const latestMessageTimeStamp = urlParams.get("latestMessageTimeStamp");
 
   queryService.getFullConversation(username, targetusername).then((data) => {
     const [error, messages] = data;

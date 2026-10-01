@@ -34,6 +34,21 @@ const getUserMessages = async (username, destination) => {
   return rows;
 };
 
+const getConversationAfter = async (
+  username,
+  destination,
+  latestMessageTimeStamp,
+) => {
+  const queryText =
+    "select * from messages where created_at in (select created_at from messages where source_username = $1 or destination_username = $2 or source_username = $2 or destination_username = $1 and created_at > $3 order by created_at desc limit 200) order by created_at asc";
+  const { rows } = await db.query(queryText, [
+    username,
+    destination,
+    latestMessageTimeStamp,
+  ]);
+  return rows;
+};
+
 const deleteUserMessages = async (username) => {
   const queryText = "DELETE FROM messages WHERE destination_username = $1";
   const { rows } = await db.query(queryText, [username]);
@@ -71,4 +86,5 @@ module.exports = {
   updateMessagesBulk,
   deleteUserMessages,
   getFullConversation,
+  getConversationAfter,
 };

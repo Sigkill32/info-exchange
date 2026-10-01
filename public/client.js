@@ -4,6 +4,7 @@ let socket = null;
 let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
+let latestMessageTimeStamp = null;
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
 const PUBLIC_VAPID_KEY =
@@ -180,9 +181,11 @@ const connectSocket = () => {
     reconnectTimer = null;
   }
 
-  socket = new WebSocket(
-    `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}`,
-  );
+  let url = `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}`;
+  if (latestMessageTimeStamp)
+    url += `latestMessageTimeStamp=${latestMessageTimeStamp}`;
+
+  socket = new WebSocket(url);
 
   socket.onopen = () => {
     reconnectAttempt = 0;
@@ -254,7 +257,7 @@ const handleSendMessage = () => {
 
   const userMessage = {
     message: message,
-    created_at: generateTimeStamp(),
+    created_at: Date.now(),
     source_username: username,
     destination_username: targetusername,
   };
