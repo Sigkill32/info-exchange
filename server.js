@@ -146,16 +146,6 @@ webSocketServer.on("connection", (ws, req) => {
   const targetusername = urlParams.get("targetusername");
   const lastSequenceId = urlParams.get("lastSequenceId");
 
-  queryService.getFullConversation(username, targetusername).then((data) => {
-    const [error, messages] = data;
-    if (error) {
-      console.log("Error fetching full conversation:", error);
-      ws.send(JSON.stringify([]));
-    } else {
-      ws.send(JSON.stringify(messages));
-    }
-  });
-
   queryService
     .getConversationAfter(username, targetusername, lastSequenceId)
     .then((data) => {
