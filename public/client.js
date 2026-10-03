@@ -4,7 +4,7 @@ let socket = null;
 let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
-let latestMessageTimeStamp = null;
+let lastSequenceId = 0;
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
 const PUBLIC_VAPID_KEY =
@@ -124,7 +124,8 @@ enableNotificationsBtn.addEventListener("click", () => {
 });
 
 const createChatBubble = (messageObj) => {
-  const { source_username, message, created_at } = messageObj;
+  const { source_username, message, created_at, id } = messageObj;
+  lastSequenceId = id;
   const chatItem = document.createElement("div");
   chatItem.classList.add("chatScreen_conversationContainer_chatItem");
   if (source_username == username) chatItem.classList.add("chat_flexEnd");
@@ -181,9 +182,7 @@ const connectSocket = () => {
     reconnectTimer = null;
   }
 
-  let url = `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}`;
-  if (latestMessageTimeStamp)
-    url += `latestMessageTimeStamp=${latestMessageTimeStamp}`;
+  let url = `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}&lastSequenceId=${encodeURIComponent(lastSequenceId)}`;
 
   socket = new WebSocket(url);
 
@@ -205,7 +204,7 @@ const connectSocket = () => {
               navigator.serviceWorker.ready.then((reg) =>
                 reg.showNotification(`New message from ${data.from}`, {
                   icon: "/images/icon-128.png",
-                })
+                }),
               );
             }
             break;

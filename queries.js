@@ -34,18 +34,10 @@ const getUserMessages = async (username, destination) => {
   return rows;
 };
 
-const getConversationAfter = async (
-  username,
-  destination,
-  latestMessageTimeStamp,
-) => {
+const getConversationAfter = async (username, destination, lastId) => {
   const queryText =
-    "select * from messages where created_at in (select created_at from messages where source_username = $1 or destination_username = $2 or source_username = $2 or destination_username = $1 and created_at > $3 order by created_at desc limit 200) order by created_at asc";
-  const { rows } = await db.query(queryText, [
-    username,
-    destination,
-    latestMessageTimeStamp,
-  ]);
+    "select * from messages where created_at in (select created_at from messages where source_username = $1 or destination_username = $2 or source_username = $2 or destination_username = $1 and id > $3 order by created_at desc limit 200) order by created_at asc";
+  const { rows } = await db.query(queryText, [username, destination, lastId]);
   return rows;
 };
 

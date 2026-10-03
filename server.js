@@ -144,7 +144,7 @@ webSocketServer.on("connection", (ws, req) => {
   const urlParams = myUrl.searchParams;
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
-  const latestMessageTimeStamp = urlParams.get("latestMessageTimeStamp");
+  const lastSequenceId = urlParams.get("lastSequenceId");
 
   queryService.getFullConversation(username, targetusername).then((data) => {
     const [error, messages] = data;
@@ -155,6 +155,18 @@ webSocketServer.on("connection", (ws, req) => {
       ws.send(JSON.stringify(messages));
     }
   });
+
+  queryService
+    .getConversationAfter(username, targetusername, lastSequenceId)
+    .then((data) => {
+      const [error, messages] = data;
+      if (error) {
+        console.log("Error fetching full conversation:", error);
+        ws.send(JSON.stringify([]));
+      } else {
+        ws.send(JSON.stringify(messages));
+      }
+    });
 
   queryService
     .createUserConnection(username, 1)
@@ -202,7 +214,10 @@ webSocketServer.on("connection", (ws, req) => {
     if (targetusername in connections) {
       // Recipient is online. Send message and a notification hint so a hidden tab can alert.
       connections[targetusername].send(JSON.stringify([userMessage]));
-      const notification = JSON.stringify({ type: "notification", from: username });
+      const notification = JSON.stringify({
+        type: "notification",
+        from: username,
+      });
       connections[targetusername].send(notification);
     } else if (pushSubscriptions[targetusername]) {
       // Recipient app is closed. Fall back to standard Web Push.
