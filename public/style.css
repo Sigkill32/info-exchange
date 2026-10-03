@@ -35,9 +35,17 @@ body {
     height: 5%;
     input {
         width: 80%;
+        border: 2px solid #E2E8F0;
+        background-color: #F8FAFC;
+        border-radius: 20px 0 0 20px;
+        padding: 10px;
     }
     button {
-        width: 20%;
+       width: 20%;
+        background-color: #0369A1;
+        border: transparent;
+        color: white;
+        border-radius: 0 20px 20px 0;
     }
 }
 
@@ -47,6 +55,7 @@ body {
     border-bottom: solid;
     padding: 10px;
     height: 75%;
+    border-color: #E2E8F0;
 }
 
 .chatScreen_conversationContainer_chatBubble {
@@ -57,7 +66,9 @@ body {
     margin-bottom: 10px;
     display: inline-block;
     max-width: 90%;
-    min-width: 60%
+    min-width: 60%;
+    background-color: #EEF2FF;
+    border-color: transparent;
 }
 
 .chatScreen_conversationContainer_chatBubble_source {
@@ -118,4 +129,15 @@ body {
 
 .chat_flexEnd {
     justify-content: flex-end;
+}
+
+.chatBubble_incoming {
+    background-color: #0284C7;
+    color: white;
+}
+
+#logoutBtn {
+    position: absolute;
+    top: 0;
+    right: 0;
 }

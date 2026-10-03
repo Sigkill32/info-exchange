@@ -130,6 +130,8 @@ const createChatBubble = (messageObj) => {
   if (source_username == username) chatItem.classList.add("chat_flexEnd");
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
+  if (source_username == username)
+    chatBubble.classList.add("chatBubble_incoming");
   const sourceElement = document.createElement("p");
   sourceElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_source",
