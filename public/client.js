@@ -241,20 +241,10 @@ const connectSocket = () => {
 };
 
 const onStartChat = () => {
-  // document.querySelector(".initScreen").classList.add("hidden");
   username = document.getElementById("username").value;
   targetusername = document.getElementById("targetusername").value;
   localStorage.setItem("username", username);
   localStorage.setItem("targetusername", targetusername);
-  // document.getElementById("targetUserNameTitle").textContent = targetusername;
-
-  // document.querySelector(".chatScreen").classList.remove("hidden");
-
-  // // TRIGGER SUBSCRIPTION LINKING AS SOON AS USER LOGS IN
-  // configurePushSubscription(username);
-
-  // connectSocket();
-  // document.querySelector(".loadingOverlay").classList.remove("hidden");
   hideInitScreenAndStartChatting();
 };
 
@@ -303,6 +293,13 @@ const initActions = () => {
 };
 
 initActions();
+
+const logoutBtn = document.getElementById("logoutBtn");
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("username");
+  localStorage.removeItem("targetusername");
+  location.reload();
+});
 
 document
   .querySelector(".chatScreen_inputcontainer")
