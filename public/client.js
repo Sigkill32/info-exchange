@@ -151,10 +151,6 @@ const createAndAppendMessage = (messages) => {
   const messagesLen = messages.length;
   if (!messagesLen) return;
   const messagesFragment = document.createDocumentFragment();
-  // messages.forEach((message) => {
-  //   const chatBubble = createChatBubble(message);
-  //   messagesFragment.appendChild(chatBubble);
-  // });
   for (let i = messagesLen - 1; i >= 0; i -= 1) {
     const chatBubble = createChatBubble(messages[i]);
     messagesFragment.appendChild(chatBubble);
@@ -245,18 +241,21 @@ const connectSocket = () => {
 };
 
 const onStartChat = () => {
-  document.querySelector(".initScreen").classList.add("hidden");
+  // document.querySelector(".initScreen").classList.add("hidden");
   username = document.getElementById("username").value;
   targetusername = document.getElementById("targetusername").value;
-  document.getElementById("targetUserNameTitle").textContent = targetusername;
+  localStorage.setItem("username", username);
+  localStorage.setItem("targetusername", targetusername);
+  // document.getElementById("targetUserNameTitle").textContent = targetusername;
 
-  document.querySelector(".chatScreen").classList.remove("hidden");
+  // document.querySelector(".chatScreen").classList.remove("hidden");
 
-  // TRIGGER SUBSCRIPTION LINKING AS SOON AS USER LOGS IN
-  configurePushSubscription(username);
+  // // TRIGGER SUBSCRIPTION LINKING AS SOON AS USER LOGS IN
+  // configurePushSubscription(username);
 
-  connectSocket();
-  document.querySelector(".loadingOverlay").classList.remove("hidden");
+  // connectSocket();
+  // document.querySelector(".loadingOverlay").classList.remove("hidden");
+  hideInitScreenAndStartChatting();
 };
 
 const handleSendMessage = () => {
@@ -281,6 +280,29 @@ const handleSendMessage = () => {
     messageInput.value = "";
   }
 };
+
+const hideInitScreenAndStartChatting = () => {
+  document.querySelector(".initScreen").classList.add("hidden");
+  document.getElementById("targetUserNameTitle").textContent = targetusername;
+
+  document.querySelector(".chatScreen").classList.remove("hidden");
+
+  // TRIGGER SUBSCRIPTION LINKING AS SOON AS USER LOGS IN
+  configurePushSubscription(username);
+
+  connectSocket();
+  document.querySelector(".loadingOverlay").classList.remove("hidden");
+};
+
+const initActions = () => {
+  if (localStorage.getItem("username")) {
+    username = localStorage.getItem("username");
+    targetusername = localStorage.getItem("targetusername");
+    hideInitScreenAndStartChatting();
+  }
+};
+
+initActions();
 
 document
   .querySelector(".chatScreen_inputcontainer")
