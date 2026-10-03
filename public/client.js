@@ -24,15 +24,62 @@ const urlBase64ToUint8Array = (base64String) => {
   return outputArray;
 };
 
-const generateTimeStamp = () => {
-  const date = new Date();
-  const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
-  const amPM = date.getHours() > 12 ? "pm" : "am";
-  const minutes =
-    date.getMinutes() > 9 ? date.getMinutes() : "0" + date.getMinutes();
-  const time = `${hours}:${minutes} ${amPM}`;
-  return time;
-};
+function createReadableTime(utcTimestamp) {
+  const date = new Date(utcTimestamp);
+
+  // 1. Get the current date and the message date in the IST time zone string (YYYY-MM-DD format)
+  const optionsDateOnly = {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+
+  // Formatters to extract localized components safely
+  const formatter = new Intl.DateTimeFormat("en-IN", optionsDateOnly);
+  const nowParts = formatter.formatToParts(new Date());
+  const dateParts = formatter.formatToParts(date);
+
+  const getISOString = (parts) =>
+    `${parts.find((p) => p.type === "year").value}-${parts.find((p) => p.type === "month").value}-${parts.find((p) => p.type === "day").value}`;
+
+  const nowISTStr = getISOString(nowParts);
+  const dateISTStr = getISOString(dateParts);
+
+  // Calculate Yesterday in IST
+  const todayIST = new Date(nowISTStr);
+  const yesterdayIST = new Date(todayIST);
+  yesterdayIST.setDate(todayIST.getDate() - 1);
+  const yesterdayISTStr = yesterdayIST.toISOString().split("T")[0];
+
+  // 2. Format the time component in 12-hour IST format (e.g., "05:59 am")
+  const istTime = date
+    .toLocaleTimeString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .toLowerCase();
+
+  // 3. Determine the prefix date label
+  let dateLabel = "";
+  if (dateISTStr === nowISTStr) {
+    dateLabel = "Today";
+  } else if (dateISTStr === yesterdayISTStr) {
+    dateLabel = "Yesterday";
+  } else {
+    // For older dates, format as "DD-MMM-YYYY" (e.g., "02-Oct-2026")
+    dateLabel = date.toLocaleDateString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  return `${dateLabel}, ${istTime}`;
+}
 
 const registerServiceWorker = () => {
   if ("serviceWorker" in navigator) {
@@ -124,7 +171,7 @@ enableNotificationsBtn.addEventListener("click", () => {
 });
 
 const createChatBubble = (messageObj) => {
-  const { source_username, message, created_at, id } = messageObj;
+  const { source_username, message, created_at } = messageObj;
   const chatItem = document.createElement("div");
   chatItem.classList.add("chatScreen_conversationContainer_chatItem");
   if (source_username == username) chatItem.classList.add("chat_flexEnd");
@@ -136,7 +183,7 @@ const createChatBubble = (messageObj) => {
   sourceElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_source",
   );
-  sourceElement.textContent = `${source_username} [${created_at}]`;
+  sourceElement.textContent = createReadableTime(created_at);
   const mesageElement = document.createElement("p");
   mesageElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_message",
