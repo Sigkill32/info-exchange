@@ -22,7 +22,7 @@ const updateMessage = async (source, destination, message) => {
 
 const getFullConversation = async (username, destination) => {
   const queryText =
-    "select * from messages where created_at in (select created_at from messages where source_username = $1 or destination_username = $2 or source_username = $2 or destination_username = $1 order by created_at desc limit 200) order by created_at asc";
+    "SELECT * FROM messages WHERE (source_username IN ($1, $2) OR destination_username IN ($2, $1)) ORDER BY id DESC LIMIT 200";
   const { rows } = await db.query(queryText, [username, destination]);
   return rows;
 };
@@ -36,7 +36,7 @@ const getUserMessages = async (username, destination) => {
 
 const getConversationAfter = async (username, destination, lastId) => {
   const queryText =
-    "select * from messages where created_at in (select created_at from messages where source_username = $1 or destination_username = $2 or source_username = $2 or destination_username = $1 and id > $3 order by created_at desc limit 200) order by created_at asc";
+    "SELECT * FROM messages WHERE (source_username IN ($1, $2) OR destination_username IN ($2, $1)) AND id > $3 ORDER BY id DESC LIMIT 200";
   const { rows } = await db.query(queryText, [username, destination, lastId]);
   return rows;
 };

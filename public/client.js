@@ -125,7 +125,6 @@ enableNotificationsBtn.addEventListener("click", () => {
 
 const createChatBubble = (messageObj) => {
   const { source_username, message, created_at, id } = messageObj;
-  lastSequenceId = id;
   const chatItem = document.createElement("div");
   chatItem.classList.add("chatScreen_conversationContainer_chatItem");
   if (source_username == username) chatItem.classList.add("chat_flexEnd");
@@ -149,12 +148,18 @@ const createChatBubble = (messageObj) => {
 
 const createAndAppendMessage = (messages) => {
   document.querySelector(".loadingOverlay").classList.add("hidden");
-  if (!messages.length) return;
+  const messagesLen = messages.length;
+  if (!messagesLen) return;
   const messagesFragment = document.createDocumentFragment();
-  messages.forEach((message) => {
-    const chatBubble = createChatBubble(message);
+  // messages.forEach((message) => {
+  //   const chatBubble = createChatBubble(message);
+  //   messagesFragment.appendChild(chatBubble);
+  // });
+  for (let i = messagesLen - 1; i >= 0; i -= 1) {
+    const chatBubble = createChatBubble(messages[i]);
     messagesFragment.appendChild(chatBubble);
-  });
+  }
+  lastSequenceId = messages[0].id;
   const conversationContainer = document.querySelector(
     ".chatScreen_conversationContainer",
   );
