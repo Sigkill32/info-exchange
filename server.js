@@ -200,8 +200,10 @@ webSocketServer.on("connection", (ws, req) => {
 
     // 3. ROUTE MESSAGES ACCORDING TO STATE (ONLINE VS APP CLOSED)
     if (targetusername in connections) {
-      // Recipient is online. Send via active WebSocket connection.
+      // Recipient is online. Send message and a notification hint so a hidden tab can alert.
       connections[targetusername].send(JSON.stringify([userMessage]));
+      const notification = JSON.stringify({ type: "notification", from: username });
+      connections[targetusername].send(notification);
     } else if (pushSubscriptions[targetusername]) {
       // Recipient app is closed. Fall back to standard Web Push.
       const pushPayload = JSON.stringify({
@@ -220,16 +222,6 @@ webSocketServer.on("connection", (ws, req) => {
           }
         });
     }
-
-    const notification = JSON.stringify({
-      type: "notification",
-      from: username,
-    });
-    webSocketServer.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(notification);
-      }
-    });
   });
 
   ws.on("close", () => {

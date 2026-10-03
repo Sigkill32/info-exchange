@@ -3,7 +3,7 @@ self.addEventListener("push", (event) => {
   const title = data.title || "New Message";
   const options = {
     body: data.body || `New message from ${data.from}`,
-    icon: "/icon-128.png",
+    icon: "/images/icon-128.png",
   };
 
   event.waitUntil(self.registration.showNotification(title, options));

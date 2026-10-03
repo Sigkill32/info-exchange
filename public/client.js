@@ -200,9 +200,13 @@ const connectSocket = () => {
       } else {
         switch (data.type) {
           case "notification": {
-            // Keep this logic for fallback notifications when app is active but tab is backgrounded
-            if (Notification.permission == "granted" && document.hidden) {
-              new Notification(`New message from ${data.from}`);
+            // Use SW-based notification so it works even when browsers block page-context Notification()
+            if (Notification.permission === "granted" && document.hidden) {
+              navigator.serviceWorker.ready.then((reg) =>
+                reg.showNotification(`New message from ${data.from}`, {
+                  icon: "/images/icon-128.png",
+                })
+              );
             }
             break;
           }
