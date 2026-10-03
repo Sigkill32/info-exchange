@@ -58,10 +58,14 @@ body {
     border-color: #E2E8F0;
 }
 
+.chatScreen_conversationContainer::-webkit-scrollbar {
+    display: none;
+}
+
 .chatScreen_conversationContainer_chatBubble {
     border: 0.5px solid;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 12px;
     position: relative;
     margin-bottom: 10px;
     display: inline-block;
@@ -69,6 +73,7 @@ body {
     min-width: 60%;
     background-color: #EEF2FF;
     border-color: transparent;
+    border-top-left-radius: 0;
 }
 
 .chatScreen_conversationContainer_chatBubble_source {
@@ -134,6 +139,8 @@ body {
 .chatBubble_incoming {
     background-color: #0284C7;
     color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 0;
 }
 
 #logoutBtn {
