@@ -350,6 +350,12 @@ logoutBtn.addEventListener("click", () => {
   location.reload();
 });
 
+document.getElementById("chatSettings").addEventListener("click", () => {
+  document
+    .querySelector("chatScreen_settings_container")
+    .classList.remove("hidden");
+});
+
 document
   .querySelector(".chatScreen_inputcontainer")
   .addEventListener("keydown", (event) => {

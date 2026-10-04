@@ -18,15 +18,20 @@
     </div>
 
     <div class="chatScreen hidden">
-        <button id="logoutBtn">LOG OUT</button>
-        <p id="statusBar"></p>
-        <h4 id="targetUserNameTitle"></h4>
-        <button id="enableNotifications">Enable Notifications</button>
+        <div class="chatScreen_settings_container hidden">
+            <button id="logoutBtn">LOG OUT</button>
+            <button id="enableNotifications">Enable Notifications</button>
+        </div>
+        <div class="chatScreen_statuscontianer">
+            <p id="statusBar"></p>
+            <h4 id="targetUserNameTitle"></h4>
+            <button id="chatSettings">⚙️</button>
+        </div>
         <div class="chatScreen_conversationContainer">
         </div>
         <div class="chatScreen_inputcontainer">
             <input type="text" id="message" placeholder="Enter your message">
-            <button id="sendMessage">SEND</button>
+            <button id="sendMessage">Send</button>
         </div>
     </div>
     <script src="./client.js"></script>

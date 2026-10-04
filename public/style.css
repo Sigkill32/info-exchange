@@ -26,13 +26,13 @@ body {
 
 .chatScreen {
     height: 100%;
-    margin: 0 10px;
 }
 
 .chatScreen_inputcontainer {
     margin-top: 10px;
     display: flex;
     height: 5%;
+    padding: 0 15px;
     input {
         width: 80%;
         border: 2px solid #E2E8F0;
@@ -52,10 +52,10 @@ body {
 
 .chatScreen_conversationContainer {
     overflow: auto;
-    border-top: solid;
-    border-bottom: solid;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
     padding: 10px;
-    height: 75%;
+    height: 83%;
     border-color: #E2E8F0;
 }
 
@@ -92,7 +92,6 @@ body {
 
 #targetUserNameTitle {
     width: 100%;
-    text-align: center;
 }
 
 #statusBar {
@@ -100,6 +99,7 @@ body {
     font-size:0.8em;
     color:#888;
     text-align:center;
+    display: none;
 }
 
 .chatScreen_targetUsernamecontainer {
@@ -145,8 +145,13 @@ body {
     border-top-right-radius: 0;
 }
 
-#logoutBtn {
-    position: absolute;
-    top: 0;
-    right: 0;
+#chatSettings {
+    background-color: transparent;
+    border: none;
+}
+
+.chatScreen_statuscontianer {
+    display: flex;
+    background-color: #F8FAFC;
+    padding: 0 15px;
 }
