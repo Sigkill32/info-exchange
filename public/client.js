@@ -5,6 +5,7 @@ let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 let lastSequenceId = 0;
+let settingsToggleState = false;
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
 const PUBLIC_VAPID_KEY =
@@ -351,9 +352,15 @@ logoutBtn.addEventListener("click", () => {
 });
 
 document.getElementById("chatSettings").addEventListener("click", () => {
-  document
-    .querySelector("chatScreen_settings_container")
-    .classList.remove("hidden");
+  const settingsContainer = document.querySelector(
+    ".chatScreen_settings_container",
+  );
+  if (!settingsToggleState) {
+    settingsContainer.classList.remove("hidden");
+  } else {
+    settingsContainer.classList.add("hidden");
+  }
+  settingsToggleState = !settingsToggleState;
 });
 
 document
