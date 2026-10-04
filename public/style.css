@@ -92,6 +92,7 @@ body {
 
 #targetUserNameTitle {
     width: 100%;
+    text-transform: capitalize;
 }
 
 #statusBar {
