@@ -304,7 +304,7 @@ const handleSendMessage = () => {
 
   const userMessage = {
     message: message,
-    created_at: Date.now(),
+    created_at: new Date().toISOString(),
     source_username: username,
     destination_username: targetusername,
   };

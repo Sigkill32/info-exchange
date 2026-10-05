@@ -204,11 +204,12 @@ webSocketServer.on("connection", (ws, req) => {
     } catch (e) {
       message = data.toString("utf-8");
     }
-    const userMessage = createMessages("TEXT_MESSAGE", {
+    const userMessage = {
       message,
       source_username: username,
       destination_username: targetusername,
-    });
+      created_at: new Date().toISOString(),
+    };
 
     updateQueue(username, targetusername, message);
 
