@@ -156,3 +156,16 @@ body {
     background-color: #F8FAFC;
     padding: 0 15px;
 }
+
+@media screen and (max-width: 768px) {
+  input[type="text"]:focus, 
+  input[type="number"]:focus, 
+  input[type="email"]:focus, 
+  input[type="password"]:focus, 
+  input[type="search"]:focus, 
+  input[type="tel"]:focus, 
+  textarea:focus, 
+  select:focus {
+    font-size: 16px !important;
+  }
+}
