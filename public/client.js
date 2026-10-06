@@ -6,6 +6,8 @@ let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 let lastSequenceId = 0;
 let settingsToggleState = false;
+let isSoundOn = true;
+isTargetUserOnline = false;
 const sendSound = new Audio("./sounds/pop.mp3");
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
@@ -223,8 +225,10 @@ const setOnlineStatus = (data) => {
   const targetUser = document.getElementById("targetUserNameTitle");
   if (data.users.includes(targetusername)) {
     targetUser.style.color = "green";
+    isTargetUserOnline = true;
   } else {
     targetUser.style.color = "black";
+    isTargetUserOnline = false;
   }
 };
 
@@ -327,7 +331,7 @@ const handleSendMessage = () => {
 
   if (message.length > 0) {
     sendSound.currentTime = 0;
-    sendSound.play();
+    if (isSoundOn) sendSound.play();
     socket.send(JSON.stringify(message));
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
@@ -376,11 +380,11 @@ document.getElementById("chatSettings").addEventListener("click", () => {
   settingsToggleState = !settingsToggleState;
 });
 
-//omptimisation scope: send typing signal only when the recipient is online
 const handleTyping = (() => {
   let timer = null;
   let isSignalSent = false;
   const sendTypingSignal = () => {
+    if (!isTargetUserOnline) return;
     clearTimeout(timer);
     if (!isSignalSent) {
       socket.send(JSON.stringify({ type: "TYPING", status: "START" }));
@@ -395,6 +399,13 @@ const handleTyping = (() => {
 })();
 
 document.getElementById("message").addEventListener("input", handleTyping);
+
+document.getElementById("togglePopSound").addEventListener("click", () => {
+  isSoundOn = !isSoundOn;
+  document.getElementById("toggglePopSound_status").textContent = isSoundOn
+    ? "Enabled"
+    : "Disabled";
+});
 
 document
   .querySelector(".chatScreen_inputcontainer")

@@ -227,7 +227,7 @@ webSocketServer.on("connection", (ws, req) => {
         });
         connections[targetusername].send(notification);
       }
-    } else if (pushSubscriptions[targetusername]) {
+    } else if (pushSubscriptions[targetusername] && message.type != "TYPING") {
       // Recipient app is closed. Fall back to standard Web Push.
       const pushPayload = JSON.stringify({
         title: "New Message",
