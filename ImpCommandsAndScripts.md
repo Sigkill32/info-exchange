@@ -27,6 +27,10 @@ sudo systemctl enable nodeserver
 
 sudo systemctl start nodeserver
 
+# check systemctl status
+
+sudo systemctl status nodeserver
+
 # Start tunneling
 
 sudo tailscale funnel --bg 3000
