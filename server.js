@@ -211,17 +211,22 @@ webSocketServer.on("connection", (ws, req) => {
       created_at: new Date().toISOString(),
     };
 
-    updateQueue(username, targetusername, message);
+    if (message.type != "TYPING")
+      updateQueue(username, targetusername, message);
 
     // 3. ROUTE MESSAGES ACCORDING TO STATE (ONLINE VS APP CLOSED)
     if (targetusername in connections) {
-      // Recipient is online. Send message and a notification hint so a hidden tab can alert.
-      connections[targetusername].send(JSON.stringify([userMessage]));
-      const notification = JSON.stringify({
-        type: "notification",
-        from: username,
-      });
-      connections[targetusername].send(notification);
+      if (message.type == "TYPING") {
+        connections[targetusername].send(JSON.stringify(message));
+      } else {
+        // Recipient is online. Send message and a notification hint so a hidden tab can alert.
+        connections[targetusername].send(JSON.stringify([userMessage]));
+        const notification = JSON.stringify({
+          type: "notification",
+          from: username,
+        });
+        connections[targetusername].send(notification);
+      }
     } else if (pushSubscriptions[targetusername]) {
       // Recipient app is closed. Fall back to standard Web Push.
       const pushPayload = JSON.stringify({

@@ -227,6 +227,12 @@ const setOnlineStatus = (data) => {
   }
 };
 
+const setTypingStatus = (data) => {
+  const typingStatus = document.getElementById("typingStatus");
+  if (data.status == "START") typingStatus.textContent = "typing...";
+  else typingStatus.textContent = "-";
+};
+
 const connectSocket = () => {
   if (reconnectTimer) {
     clearTimeout(reconnectTimer);
@@ -262,6 +268,10 @@ const connectSocket = () => {
           }
           case "ONLINE_STATUS": {
             setOnlineStatus(data);
+            break;
+          }
+          case "TYPING": {
+            setTypingStatus(data);
             break;
           }
         }
@@ -362,6 +372,25 @@ document.getElementById("chatSettings").addEventListener("click", () => {
   }
   settingsToggleState = !settingsToggleState;
 });
+
+const handleTyping = (() => {
+  let timer = null;
+  let isSignalSent = false;
+  const sendTypingSignal = () => {
+    clearTimeout(timer);
+    if (!isSignalSent) {
+      socket.send(JSON.stringify({ type: "TYPING", status: "START" }));
+      isSignalSent = true;
+    }
+    timer = setTimeout(() => {
+      socket.send(JSON.stringify({ type: "TYPING", status: "STOP" }));
+      isSignalSent = false;
+    }, 500);
+  };
+  return sendTypingSignal;
+})();
+
+document.getElementById("message").addEventListener("input", handleTyping);
 
 document
   .querySelector(".chatScreen_inputcontainer")

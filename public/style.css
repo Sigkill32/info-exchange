@@ -93,6 +93,7 @@ body {
 #targetUserNameTitle {
     width: 100%;
     text-transform: capitalize;
+    margin: 5px 0;
 }
 
 #statusBar {
@@ -155,6 +156,15 @@ body {
     display: flex;
     background-color: #F8FAFC;
     padding: 0 15px;
+    justify-content: space-between;
+}
+
+.chatScreen_statuscontianer_usercontainer {
+    padding: 5px 0;
+    p {
+        margin: 5px 0;
+        font-size: 12px;
+    }
 }
 
 @media screen and (max-width: 768px) {
