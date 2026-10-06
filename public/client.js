@@ -373,6 +373,7 @@ document.getElementById("chatSettings").addEventListener("click", () => {
   settingsToggleState = !settingsToggleState;
 });
 
+//omptimisation scope: send typing signal only when the recipient is online
 const handleTyping = (() => {
   let timer = null;
   let isSignalSent = false;
