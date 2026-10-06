@@ -6,6 +6,7 @@ let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 let lastSequenceId = 0;
 let settingsToggleState = false;
+const sendSound = new Audio("./sounds/pop.mp3");
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
 const PUBLIC_VAPID_KEY =
@@ -325,6 +326,8 @@ const handleSendMessage = () => {
   }
 
   if (message.length > 0) {
+    sendSound.currentTime = 0;
+    sendSound.play();
     socket.send(JSON.stringify(message));
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
