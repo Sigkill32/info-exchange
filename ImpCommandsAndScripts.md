@@ -6,6 +6,7 @@ sudo docker exec -it phone-db psql -U postgres
 
 CREATE TABLE connections (username TEXT PRIMARY KEY, status INT2 NOT NULL);
 CREATE TABLE messages(id SERIAL PRIMARY KEY, message TEXT NOT NULL, destination_username TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW(), source_username TEXT REFERENCES connections(username) ON DELETE CASCADE);
+ALTER table messages ADD reply_from INT4;
 
 # 1. Stop the server immediately
 
@@ -30,6 +31,14 @@ sudo systemctl start nodeserver
 # check systemctl status
 
 sudo systemctl status nodeserver
+
+# stop tailscale service
+
+sudo systemctl stop tailscaled
+
+# start tailscale service
+
+sudo systemctl start tailscaled
 
 # Start tunneling
 
