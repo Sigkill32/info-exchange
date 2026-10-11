@@ -68,7 +68,7 @@ body {
     padding: 10px;
     border-radius: 12px;
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
     display: inline-block;
     max-width: 90%;
     min-width: 60%;
@@ -88,6 +88,24 @@ body {
     margin-top: 1.5em;
     text-wrap: wrap;
     overflow-wrap: anywhere;
+}
+
+.chatScreen_conversationContainer_chatBubble_replyButton {
+    position: absolute;
+    top: -12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.chatScreen_conversationContainer_chatBubble_replyButton_outgoing {
+    transform: rotate(-180deg);
+    right: -12px;
+}
+
+.chatScreen_conversationContainer_chatBubble_replyButton_incoming {
+    left: -12px;
 }
 
 #targetUserNameTitle {

@@ -176,25 +176,50 @@ enableNotificationsBtn.addEventListener("click", () => {
 
 const createChatBubble = (messageObj) => {
   const { source_username, message, created_at } = messageObj;
+
   const chatItem = document.createElement("div");
   chatItem.classList.add("chatScreen_conversationContainer_chatItem");
   if (source_username == username) chatItem.classList.add("chat_flexEnd");
+
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
   if (source_username == username)
     chatBubble.classList.add("chatBubble_incoming");
+
   const sourceElement = document.createElement("p");
   sourceElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_source",
   );
   sourceElement.textContent = createReadableTime(created_at);
+
   const mesageElement = document.createElement("p");
   mesageElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_message",
   );
   mesageElement.textContent = message;
+
+  const replyButton = document.createElement("button");
+  const replyButtonClass = "chatScreen_conversationContainer_chatBubble_replyButton";
+  replyButton.classList.add(replyButtonClass);
+  if (source_username == username)
+    replyButton.classList.add(replyButtonClass + "_incoming");
+  else
+    replyButton.classList.add(replyButtonClass + "_outgoing");
+  replyButton.innerHTML = `
+    <svg width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <path d="M9 16h7.2l-2.6 2.6L15 20l5-5-5-5-1.4 1.4 2.6 2.6H9c-2.2 0-4-1.8-4-4s1.8-4 4-4h2V4H9c-3.3 0-6 2.7-6 6s2.7 6 6 6z"/>
+      </g>
+    </svg>
+  `;
+  replyButton.addEventListener("click", () => {
+    // console.log("reply button clicked", messageObj);
+    // add message to input
+  });
+
   chatBubble.appendChild(sourceElement);
   chatBubble.appendChild(mesageElement);
+  chatBubble.appendChild(replyButton);
   chatItem.appendChild(chatBubble);
   return chatItem;
 };
