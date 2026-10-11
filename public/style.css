@@ -28,11 +28,46 @@ body {
     height: 100%;
 }
 
+.chatScreen_inputcontainer_external {
+    display: flex;
+    flex-direction: column;
+}
+
+.chatScreen_inputcontainer_external_replycontainer {
+    position: relative;
+    margin: 15px 15px 0;
+    background: #E2E8F0;
+    padding: 5px;
+    border-radius: 5px 5px 0 0;
+}
+
+.chatScreen_inputcontainer_external_replycontainer_close {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.chatScreen_inputcontainer_external_replycontainer_replyToUserName {
+    font-size: 10px;
+    padding: 5px;
+    border-left: 5px solid #0369A1;
+}
+
+.chatScreen_inputcontainer_external_replycontainer_replyToMessage {
+    padding: 5px;
+    border-left: 5px solid #0369A1;
+}
+
 .chatScreen_inputcontainer {
     margin-top: 10px;
     display: flex;
     height: 5%;
     padding: 0 15px;
+    flex: auto;
     input {
         width: 80%;
         border: 2px solid #E2E8F0;
@@ -50,6 +85,15 @@ body {
     }
 }
 
+.noBorderTopRadius {
+    input {
+        border-radius: 0px 0 0 20px;
+    }
+    button {
+        border-radius: 0 0px 20px 0;
+    }
+}
+
 .chatScreen_conversationContainer {
     overflow: auto;
     border-top: 1px solid;
@@ -57,6 +101,10 @@ body {
     padding: 10px;
     height: 83%;
     border-color: #E2E8F0;
+}
+
+.decreaseHeight {
+    height: 76%;
 }
 
 .chatScreen_conversationContainer::-webkit-scrollbar {
@@ -183,6 +231,10 @@ body {
         margin: 5px 0;
         font-size: 12px;
     }
+}
+
+.noMargin {
+    margin: 0;
 }
 
 @media screen and (max-width: 768px) {

@@ -174,6 +174,60 @@ enableNotificationsBtn.addEventListener("click", () => {
   });
 });
 
+const removeReplyPreview = () => {
+  document
+    .querySelector(".chatScreen_inputcontainer_external_replycontainer")
+    ?.remove();
+  document
+    .querySelector(".chatScreen_inputcontainer")
+    ?.classList.remove("noMargin", "noBorderTopRadius");
+  document
+    .querySelector(".chatScreen_conversationContainer")
+    ?.classList.remove("decreaseHeight");
+};
+
+const appendReplyMessage = (messageObj, onClose) => {
+  const replyClassName = "chatScreen_inputcontainer_external_replycontainer";
+  const existingReplyChatBubble = document.querySelector(`.${replyClassName}`);
+  if (existingReplyChatBubble) {
+    existingReplyChatBubble.remove();
+  }
+
+  const inputcontainer = document.querySelector(".chatScreen_inputcontainer");
+  inputcontainer.classList.add("noMargin");
+  inputcontainer.classList.add("noBorderTopRadius");
+
+  const conversationContainer = document.querySelector(".chatScreen_conversationContainer");
+  conversationContainer.classList.add("decreaseHeight");
+
+  const replyChatBubbleContainer = document.createElement("div");
+  replyChatBubbleContainer.classList.add(replyClassName);
+
+  const replyToUserName = document.createElement("div");
+  replyToUserName.classList.add(replyClassName + "_replyToUserName");
+  replyToUserName.textContent = messageObj.source_username;
+
+  const replyToMessage = document.createElement("div");
+  replyToMessage.classList.add(replyClassName + "_replyToMessage");
+  replyToMessage.textContent = messageObj.message;
+
+  const closeReply = document.createElement("button");
+  closeReply.type = "button";
+  closeReply.classList.add(replyClassName + "_close");
+  closeReply.textContent = "x";
+  closeReply.addEventListener("click", () => {
+    removeReplyPreview();
+    onClose();
+  });
+
+  replyChatBubbleContainer.appendChild(replyToUserName);
+  replyChatBubbleContainer.appendChild(replyToMessage);
+  replyChatBubbleContainer.appendChild(closeReply);
+
+  const inputcontainerExternal = document.querySelector(".chatScreen_inputcontainer_external")
+  inputcontainerExternal.prepend(replyChatBubbleContainer);
+};
+
 const createChatBubble = (messageObj) => {
   const { source_username, message, created_at } = messageObj;
 
@@ -205,6 +259,7 @@ const createChatBubble = (messageObj) => {
     replyButton.classList.add(replyButtonClass + "_incoming");
   else
     replyButton.classList.add(replyButtonClass + "_outgoing");
+  replyButton.dataset.message = JSON.stringify(messageObj);
   replyButton.innerHTML = `
     <svg width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <g>
@@ -212,10 +267,6 @@ const createChatBubble = (messageObj) => {
       </g>
     </svg>
   `;
-  replyButton.addEventListener("click", () => {
-    // console.log("reply button clicked", messageObj);
-    // add message to input
-  });
 
   chatBubble.appendChild(sourceElement);
   chatBubble.appendChild(mesageElement);
@@ -338,7 +389,7 @@ const onStartChat = () => {
   hideInitScreenAndStartChatting();
 };
 
-const handleSendMessage = () => {
+const handleSendMessage = (replyFrom = null) => {
   const messageInput = document.getElementById("message");
   const message = messageInput.value;
 
@@ -347,6 +398,7 @@ const handleSendMessage = () => {
     created_at: new Date().toISOString(),
     source_username: username,
     destination_username: targetusername,
+    reply_from: replyFrom?.id,
   };
 
   if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -360,7 +412,9 @@ const handleSendMessage = () => {
     socket.send(JSON.stringify(message));
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
+    return true;
   }
+  return false;
 };
 
 const hideInitScreenAndStartChatting = () => {
@@ -423,6 +477,26 @@ const handleTyping = (() => {
   return sendTypingSignal;
 })();
 
+const { appendReply, handleSend } = (() => {
+  let replyTo = null;
+
+  const appendReply = (messageObj) => {
+    replyTo = messageObj;
+    appendReplyMessage(messageObj, () => {
+      replyTo = null;
+    });
+  };
+
+  const handleSend = () => {
+    const sent = handleSendMessage(replyTo);
+    if (!sent) return;
+    replyTo = null;
+    removeReplyPreview();
+  };
+
+  return { appendReply, handleSend };
+})();
+
 document.getElementById("message").addEventListener("input", handleTyping);
 
 document.getElementById("togglePopSound").addEventListener("click", () => {
@@ -433,14 +507,26 @@ document.getElementById("togglePopSound").addEventListener("click", () => {
 });
 
 document
+  .querySelector(".chatScreen_conversationContainer")
+  .addEventListener("click", (event) => {
+    const replyButton = event.target.closest(
+      ".chatScreen_conversationContainer_chatBubble_replyButton",
+    );
+    if (!replyButton) return;
+
+    const messageObj = JSON.parse(replyButton.dataset.message);
+    appendReply(messageObj);
+  });
+
+document
   .querySelector(".chatScreen_inputcontainer")
   .addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
-      handleSendMessage();
+      handleSend();
     }
   });
 
-sendMessage.addEventListener("click", handleSendMessage);
+sendMessage.addEventListener("click", handleSend);
 startChatting.addEventListener("click", onStartChat);
 // Initialize button UI state on startup
 updateNotificationButton();
