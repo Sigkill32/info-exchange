@@ -197,7 +197,9 @@ const appendReplyMessage = (messageObj, onClose) => {
   inputcontainer.classList.add("noMargin");
   inputcontainer.classList.add("noBorderTopRadius");
 
-  const conversationContainer = document.querySelector(".chatScreen_conversationContainer");
+  const conversationContainer = document.querySelector(
+    ".chatScreen_conversationContainer",
+  );
   conversationContainer.classList.add("decreaseHeight");
 
   const replyChatBubbleContainer = document.createElement("div");
@@ -224,7 +226,9 @@ const appendReplyMessage = (messageObj, onClose) => {
   replyChatBubbleContainer.appendChild(replyToMessage);
   replyChatBubbleContainer.appendChild(closeReply);
 
-  const inputcontainerExternal = document.querySelector(".chatScreen_inputcontainer_external")
+  const inputcontainerExternal = document.querySelector(
+    ".chatScreen_inputcontainer_external",
+  );
   inputcontainerExternal.prepend(replyChatBubbleContainer);
 };
 
@@ -253,12 +257,12 @@ const createChatBubble = (messageObj) => {
   mesageElement.textContent = message;
 
   const replyButton = document.createElement("button");
-  const replyButtonClass = "chatScreen_conversationContainer_chatBubble_replyButton";
+  const replyButtonClass =
+    "chatScreen_conversationContainer_chatBubble_replyButton";
   replyButton.classList.add(replyButtonClass);
   if (source_username == username)
     replyButton.classList.add(replyButtonClass + "_incoming");
-  else
-    replyButton.classList.add(replyButtonClass + "_outgoing");
+  else replyButton.classList.add(replyButtonClass + "_outgoing");
   replyButton.dataset.message = JSON.stringify(messageObj);
   replyButton.innerHTML = `
     <svg width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -403,13 +407,15 @@ const handleSendMessage = (replyFrom = null) => {
 
   if (!socket || socket.readyState !== WebSocket.OPEN) {
     alert("Cannot send message. You are currently offline.");
-    return;
+    return false;
   }
 
   if (message.length > 0) {
     sendSound.currentTime = 0;
     if (isSoundOn) sendSound.play();
-    socket.send(JSON.stringify(message));
+    socket.send(
+      JSON.stringify({ message: message, reply_from: replyFrom?.id }),
+    );
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
     return true;

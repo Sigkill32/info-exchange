@@ -55,13 +55,20 @@ const updateMessagesBulk = async (messagesArray) => {
   let index = 1;
 
   for (const msg of messagesArray) {
-    valuePlaceholders.push(`($${index}, $${index + 1}, $${index + 2})`);
-    values.push(msg.source, msg.destination, msg.message);
+    valuePlaceholders.push(
+      `($${index}, $${index + 1}, $${index + 2}, $${index + 3})`,
+    );
+    values.push(
+      msg.source,
+      msg.destination,
+      msg.message,
+      msg.reply_from ? Number(msg.reply_from) : null,
+    );
     index += 3;
   }
 
   const queryText = `
-    INSERT INTO messages (source_username, destination_username, message) 
+    INSERT INTO messages (source_username, destination_username, message, reply_from) 
     VALUES ${valuePlaceholders.join(", ")} 
     RETURNING *;
   `;

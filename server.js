@@ -125,7 +125,8 @@ const updateQueue = (source, destination, message) => {
   dbWriteQueue.push({
     source: source,
     destination: destination,
-    message: message,
+    message: message.message,
+    reply_from: message.reply_from,
   });
 
   if (dbWriteQueue.length >= 100) {
@@ -204,12 +205,6 @@ webSocketServer.on("connection", (ws, req) => {
     } catch (e) {
       message = data.toString("utf-8");
     }
-    const userMessage = {
-      message,
-      source_username: username,
-      destination_username: targetusername,
-      created_at: new Date().toISOString(),
-    };
 
     if (message.type != "TYPING")
       updateQueue(username, targetusername, message);
@@ -219,6 +214,13 @@ webSocketServer.on("connection", (ws, req) => {
       if (message.type == "TYPING") {
         connections[targetusername].send(JSON.stringify(message));
       } else {
+        const userMessage = {
+          message: message.message,
+          source_username: username,
+          destination_username: targetusername,
+          created_at: new Date().toISOString(),
+          reply_from: message?.reply_from || null,
+        };
         // Recipient is online. Send message and a notification hint so a hidden tab can alert.
         connections[targetusername].send(JSON.stringify([userMessage]));
         const notification = JSON.stringify({
