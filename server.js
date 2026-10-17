@@ -126,7 +126,7 @@ const updateQueue = (source, destination, message) => {
     source: source,
     destination: destination,
     message: message.message,
-    reply_from: message.reply_from,
+    replyOf: message.replyOf,
   });
 
   if (dbWriteQueue.length >= 100) {
@@ -206,8 +206,8 @@ webSocketServer.on("connection", (ws, req) => {
       message = data.toString("utf-8");
     }
 
-    if (message.type != "TYPING")
-      updateQueue(username, targetusername, message);
+    // if (message.type != "TYPING")
+    //   updateQueue(username, targetusername, message);
 
     // 3. ROUTE MESSAGES ACCORDING TO STATE (ONLINE VS APP CLOSED)
     if (targetusername in connections) {
@@ -219,7 +219,7 @@ webSocketServer.on("connection", (ws, req) => {
           source_username: username,
           destination_username: targetusername,
           created_at: new Date().toISOString(),
-          reply_from: message?.reply_from || null,
+          replyOf: message?.replyOf || null,
         };
         // Recipient is online. Send message and a notification hint so a hidden tab can alert.
         connections[targetusername].send(JSON.stringify([userMessage]));
