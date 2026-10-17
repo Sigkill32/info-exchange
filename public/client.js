@@ -4,7 +4,7 @@ let socket = null;
 let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
-let lastSequenceId = 0;
+let lastSequenceId = -1;
 let settingsToggleState = false;
 let isSoundOn = true;
 isTargetUserOnline = false;
@@ -288,7 +288,7 @@ const createAndAppendMessage = (messages) => {
     const chatBubble = createChatBubble(messages[i]);
     messagesFragment.appendChild(chatBubble);
   }
-  lastSequenceId = messages[0].id;
+  if (lastSequenceId < 0) lastSequenceId = Number(messages[0].id);
   const conversationContainer = document.querySelector(
     ".chatScreen_conversationContainer",
   );
@@ -393,7 +393,7 @@ const onStartChat = () => {
   hideInitScreenAndStartChatting();
 };
 
-const handleSendMessage = (replyFrom = null) => {
+const handleSendMessage = (replyOf = null) => {
   const messageInput = document.getElementById("message");
   const message = messageInput.value;
 
@@ -402,7 +402,7 @@ const handleSendMessage = (replyFrom = null) => {
     created_at: new Date().toISOString(),
     source_username: username,
     destination_username: targetusername,
-    reply_from: replyFrom?.id,
+    replyOf: replyOf,
   };
 
   if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -413,8 +413,13 @@ const handleSendMessage = (replyFrom = null) => {
   if (message.length > 0) {
     sendSound.currentTime = 0;
     if (isSoundOn) sendSound.play();
+    lastSequenceId += 1;
     socket.send(
-      JSON.stringify({ message: message, reply_from: replyFrom?.id }),
+      JSON.stringify({
+        message: message,
+        replyOf: replyOf,
+        messageId: lastSequenceId,
+      }),
     );
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
@@ -522,6 +527,7 @@ document
 
     const messageObj = JSON.parse(replyButton.dataset.message);
     appendReply(messageObj);
+    document.getElementById("message").focus();
   });
 
 document

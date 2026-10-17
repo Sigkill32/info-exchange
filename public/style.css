@@ -55,6 +55,8 @@ body {
     font-size: 10px;
     padding: 5px;
     border-left: 5px solid #0369A1;
+    text-wrap: wrap;
+    overflow-wrap: anywhere;
 }
 
 .chatScreen_inputcontainer_external_replycontainer_replyToMessage {
