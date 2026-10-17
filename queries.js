@@ -55,21 +55,45 @@ const updateMessagesBulk = async (messagesArray) => {
   let index = 1;
 
   for (const msg of messagesArray) {
-    valuePlaceholders.push(
-      `($${index}, $${index + 1}, $${index + 2}, $${index + 3})`,
-    );
-    values.push(
-      msg.source,
-      msg.destination,
-      msg.message,
-      msg.reply_from ? Number(msg.reply_from) : null,
-    );
+    valuePlaceholders.push(`($${index}, $${index + 1}, $${index + 2})`);
+    values.push(msg.source, msg.destination, msg.message);
     index += 3;
   }
 
   const queryText = `
-    INSERT INTO messages (source_username, destination_username, message, reply_from) 
+    INSERT INTO messages (source_username, destination_username, message) 
     VALUES ${valuePlaceholders.join(", ")} 
+    RETURNING *;
+  `;
+
+  const { rows } = await db.query(queryText, values);
+  return rows;
+};
+
+const updateReplies = async (replyTypeMessages) => {
+  if (!replyTypeMessages || replyTypeMessages.length === 0) return [];
+
+  const values = [];
+  let caseStringBuilder = "";
+  const idPlaceholders = [];
+  let index = 1;
+
+  for (const msg of replyTypeMessages) {
+    caseStringBuilder += `WHEN $${index} THEN $${index + 1} `;
+    values.push(msg.reply_child, msg.id);
+    idPlaceholders.push(`$${index}`);
+    index += 2;
+  }
+
+  const idsString = idPlaceholders.join(", ");
+
+  const queryText = `
+    UPDATE messages
+    SET reply_child = CASE id
+        ${caseStringBuilder}
+        ELSE reply_child
+    END
+    WHERE id IN (${idsString})
     RETURNING *;
   `;
 
@@ -86,4 +110,5 @@ module.exports = {
   deleteUserMessages,
   getFullConversation,
   getConversationAfter,
+  updateReplies,
 };

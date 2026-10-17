@@ -83,6 +83,7 @@ const webSocketServer = new WebSocketServer({ server: httpServer });
 
 const connections = {};
 let dbWriteQueue = [];
+let repliesUpdateQueue = [];
 
 const heartbeatInterval = setInterval(() => {
   webSocketServer.clients.forEach((ws) => {
@@ -113,12 +114,35 @@ async function flushQueueToDatabase() {
   }
 }
 
+async function updateRepliesOnDatabase() {
+  if (repliesUpdateQueue.length === 0) return;
+
+  const batchToUpdate = [...repliesUpdateQueue];
+  repliesUpdateQueue = [];
+
+  try {
+    await queryService.updateReplies(batchToUpdate);
+    console.log(`[DB Flush] Successfully updated replies`);
+  } catch (error) {
+    console.error(
+      `[DB Flush] failed to update replies. Restoring queue items`,
+      error,
+    );
+    repliesUpdateQueue = [...batchToUpdate, ...repliesUpdateQueue];
+  }
+}
+
 const FLUSH_INTERVAL_MS = 3000;
 const dbFlushInterval = setInterval(flushQueueToDatabase, FLUSH_INTERVAL_MS);
+const repliesUpdateInterval = setInterval(
+  updateRepliesOnDatabase,
+  FLUSH_INTERVAL_MS,
+);
 
 webSocketServer.on("close", () => {
   clearInterval(heartbeatInterval);
   clearInterval(dbFlushInterval);
+  clearInterval(repliesUpdateInterval);
 });
 
 const updateQueue = (source, destination, message) => {
@@ -126,11 +150,18 @@ const updateQueue = (source, destination, message) => {
     source: source,
     destination: destination,
     message: message.message,
-    replyOf: message.replyOf,
   });
+
+  if (message.replyOf) {
+    repliesUpdateQueue.push({
+      id: message.messageId,
+      reply_child: message.replyOf.id,
+    });
+  }
 
   if (dbWriteQueue.length >= 100) {
     flushQueueToDatabase();
+    updateRepliesOnDatabase();
   }
 };
 
@@ -206,8 +237,8 @@ webSocketServer.on("connection", (ws, req) => {
       message = data.toString("utf-8");
     }
 
-    // if (message.type != "TYPING")
-    //   updateQueue(username, targetusername, message);
+    if (message.type != "TYPING")
+      updateQueue(username, targetusername, message);
 
     // 3. ROUTE MESSAGES ACCORDING TO STATE (ONLINE VS APP CLOSED)
     if (targetusername in connections) {
