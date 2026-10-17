@@ -241,6 +241,7 @@ const createChatBubble = (messageObj) => {
 
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
+  chatBubble.setAttribute("id", messageObj.id);
   if (source_username == username)
     chatBubble.classList.add("chatBubble_incoming");
 
@@ -261,8 +262,9 @@ const createChatBubble = (messageObj) => {
   let replyDiv = null;
 
   if (messageObj.replyOf) {
-    replyDiv = document.createElement("div");
+    replyDiv = document.createElement("a");
     replyDiv.classList.add("chatScreen_conversationContainer_chatBubble_reply");
+    replyDiv.setAttribute("href", `#${messageObj.replyOf.id}`);
     replyDiv.textContent = messageObj.replyOf.message;
   }
   //-----------------------------------------------------------------------------
