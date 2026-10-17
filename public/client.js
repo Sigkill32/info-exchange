@@ -256,6 +256,17 @@ const createChatBubble = (messageObj) => {
   );
   mesageElement.textContent = message;
 
+  // --------------------throw away test code-----------------------------------
+  // --------------------Reply code should probably go here your decision baby---
+  let replyDiv = null;
+
+  if (messageObj.replyOf) {
+    replyDiv = document.createElement("div");
+    replyDiv.classList.add("chatScreen_conversationContainer_chatBubble_reply");
+    replyDiv.textContent = messageObj.replyOf.message;
+  }
+  //-----------------------------------------------------------------------------
+
   const replyButton = document.createElement("button");
   const replyButtonClass =
     "chatScreen_conversationContainer_chatBubble_replyButton";
@@ -273,6 +284,7 @@ const createChatBubble = (messageObj) => {
   `;
 
   chatBubble.appendChild(sourceElement);
+  if (replyDiv) chatBubble.appendChild(replyDiv);
   chatBubble.appendChild(mesageElement);
   chatBubble.appendChild(replyButton);
   chatItem.appendChild(chatBubble);
@@ -283,9 +295,17 @@ const createAndAppendMessage = (messages) => {
   document.querySelector(".loadingOverlay").classList.add("hidden");
   const messagesLen = messages.length;
   if (!messagesLen) return;
+  const repliesMap = {};
   const messagesFragment = document.createDocumentFragment();
   for (let i = messagesLen - 1; i >= 0; i -= 1) {
-    const chatBubble = createChatBubble(messages[i]);
+    const currentMessage = messages[i];
+    if (currentMessage.reply_child && !currentMessage.replyOf) {
+      repliesMap[currentMessage.reply_child] = currentMessage;
+    }
+    if (currentMessage.id in repliesMap) {
+      currentMessage.replyOf = repliesMap[currentMessage.id];
+    }
+    const chatBubble = createChatBubble(currentMessage);
     messagesFragment.appendChild(chatBubble);
   }
   if (lastSequenceId < 0) lastSequenceId = Number(messages[0].id);
