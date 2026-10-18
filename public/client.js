@@ -436,6 +436,7 @@ const handleSendMessage = (replyOf = null) => {
     sendSound.currentTime = 0;
     if (isSoundOn) sendSound.play();
     lastSequenceId += 1;
+    userMessage.id = lastSequenceId;
     socket.send(
       JSON.stringify({
         message: message,
