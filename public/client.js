@@ -6,7 +6,7 @@ let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 let lastSequenceId = -1;
 let settingsToggleState = false;
-let isSoundOn = true;
+let isSoundOn = false;
 isTargetUserOnline = false;
 const sendSound = new Audio("./sounds/pop.mp3");
 
