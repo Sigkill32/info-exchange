@@ -441,7 +441,6 @@ const handleSendMessage = (replyOf = null) => {
       JSON.stringify({
         message: message,
         replyOf: replyOf,
-        messageId: lastSequenceId,
       }),
     );
     createAndAppendMessage([userMessage]);
