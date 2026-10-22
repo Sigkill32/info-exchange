@@ -25,12 +25,16 @@ body {
 }
 
 .chatScreen {
-    height: 100%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
 }
 
 .chatScreen_inputcontainer_external {
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    margin-bottom: 10px;
 }
 
 .chatScreen_inputcontainer_external_replycontainer {
@@ -67,7 +71,6 @@ body {
 .chatScreen_inputcontainer {
     margin-top: 10px;
     display: flex;
-    height: 5%;
     padding: 0 15px;
     flex: auto;
     input {
@@ -97,16 +100,17 @@ body {
 }
 
 .chatScreen_conversationContainer {
-    overflow: auto;
+    overflow-y: auto;
     border-top: 1px solid;
     border-bottom: 1px solid;
     padding: 10px;
-    height: 83%;
+    flex: 1;
+    min-height: 0;
     border-color: #E2E8F0;
 }
 
 .decreaseHeight {
-    height: 76%;
+    /* flex layout adjusts automatically when reply preview appears */
 }
 
 .chatScreen_conversationContainer::-webkit-scrollbar {
@@ -220,8 +224,13 @@ body {
     border: none;
 }
 
+.chatScreen_settings_container {
+    flex-shrink: 0;
+}
+
 .chatScreen_statuscontianer {
     display: flex;
+    flex-shrink: 0;
     background-color: #F8FAFC;
     padding: 0 15px;
     justify-content: space-between;
