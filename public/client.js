@@ -393,6 +393,7 @@ const connectSocket = () => {
   socket.onclose = (event) => {
     if (event.wasClean) {
       showStatus("Disconnected");
+      setTypingStatus({ status: "STOP" });
       return;
     }
     reconnectAttempt += 1;
