@@ -36,7 +36,7 @@ body {
 .chatScreen_inputcontainer_external_replycontainer {
     position: relative;
     margin: 15px 15px 0;
-    background: #E2E8F0;
+    background: #ECECEC;
     padding: 5px;
     border-radius: 5px 5px 0 0;
 }
@@ -54,14 +54,14 @@ body {
 .chatScreen_inputcontainer_external_replycontainer_replyToUserName {
     font-size: 10px;
     padding: 5px;
-    border-left: 5px solid #0369A1;
+    border-left: 5px solid;
     text-wrap: wrap;
     overflow-wrap: anywhere;
 }
 
 .chatScreen_inputcontainer_external_replycontainer_replyToMessage {
     padding: 5px;
-    border-left: 5px solid #0369A1;
+    border-left: 5px solid;
 }
 
 .chatScreen_inputcontainer {
