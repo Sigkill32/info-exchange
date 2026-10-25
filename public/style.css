@@ -230,10 +230,6 @@ body {
     border-radius: 50%;
 }
 
-.chatLoading {
-    background-color: gray;   
-}
-
 .loadingOverlay {
     position: absolute;
     display: flex;
@@ -241,9 +237,11 @@ body {
     justify-content: center;
     width: 100%;
     height: 100%;
-    background-color: grey;
-    color: #ffffff;
-    font-size: 2rem;
+    background-color: var(--light-color);
+
+    span {
+        animation: spin 3s linear infinite;
+    }
 }
 
 .chatScreen_conversationContainer_chatItem {
@@ -294,6 +292,15 @@ body {
     padding: 5px;
     border-radius: 5px;
 }
+
+@keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
 @media screen and (max-width: 768px) {
   input[type="text"]:focus, 
