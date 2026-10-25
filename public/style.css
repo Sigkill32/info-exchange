@@ -232,6 +232,7 @@ body {
 
 .loadingOverlay {
     position: absolute;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -259,9 +260,54 @@ body {
     border-top-right-radius: 0;
 }
 
-#chatSettings {
+.chatSettings {
+    position: relative;
+    align-self: center;
+}
+
+#chatSettings_btn {
     background-color: transparent;
     border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.chatSettings_content {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 2;
+    width: 220px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid var(--light-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    input {
+        margin: 0;
+        accent-color: var(--dark-color);
+    }
+}
+
+#logoutBtn {
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: var(--dark-color);
+    color: #fff;
+    cursor: pointer;
 }
 
 .chatScreen_statuscontianer {

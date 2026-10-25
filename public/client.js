@@ -5,7 +5,6 @@ let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
 let lastSequenceId = -1;
-let settingsToggleState = false;
 let isSoundOn = false;
 isTargetUserOnline = false;
 const sendSound = new Audio("./sounds/pop.mp3");
@@ -108,20 +107,23 @@ let wsUri = `${wsProtocol}//${window.location.host}`;
 
 const startChatting = document.getElementById("startChatting");
 const sendMessage = document.getElementById("sendMessage");
-const enableNotificationsBtn = document.getElementById("enableNotifications");
+const enableNotificationsInput = document.getElementById("enableNotifications");
+const enablePopSoundInput = document.getElementById("enablePopSound");
 
 const updateNotificationButton = () => {
   if (!("Notification" in window)) {
-    enableNotificationsBtn.textContent = "Notifications not supported";
-    enableNotificationsBtn.disabled = true;
+    enableNotificationsInput.checked = false;
+    enableNotificationsInput.disabled = true;
     return;
   }
   if (Notification.permission === "granted") {
-    enableNotificationsBtn.textContent = "Notifications enabled";
-    enableNotificationsBtn.disabled = true;
+    enableNotificationsInput.checked = true;
+    enableNotificationsInput.disabled = true;
   } else if (Notification.permission === "denied") {
-    enableNotificationsBtn.textContent = "Notifications blocked";
-    enableNotificationsBtn.disabled = true;
+    enableNotificationsInput.checked = false;
+    enableNotificationsInput.disabled = true;
+  } else {
+    enableNotificationsInput.checked = false;
   }
 };
 
@@ -164,7 +166,8 @@ const configurePushSubscription = async (user) => {
   }
 };
 
-enableNotificationsBtn.addEventListener("click", () => {
+enableNotificationsInput.addEventListener("change", () => {
+  if (!enableNotificationsInput.checked) return;
   Notification.requestPermission().then((permission) => {
     updateNotificationButton();
     // If the user logs in first, then hits allow notifications, immediately sync
@@ -481,16 +484,16 @@ logoutBtn.addEventListener("click", () => {
   location.reload();
 });
 
-document.getElementById("chatSettings").addEventListener("click", () => {
-  const settingsContainer = document.querySelector(
-    ".chatScreen_settings_container",
-  );
-  if (!settingsToggleState) {
-    settingsContainer.classList.remove("hidden");
-  } else {
-    settingsContainer.classList.add("hidden");
-  }
-  settingsToggleState = !settingsToggleState;
+const chatSettingsContent = document.querySelector(".chatSettings_content");
+
+document.getElementById("chatSettings_btn").addEventListener("click", (event) => {
+  event.stopPropagation();
+  chatSettingsContent.classList.toggle("hidden");
+});
+
+document.addEventListener("click", (event) => {
+  if (event.target.closest(".chatSettings")) return;
+  chatSettingsContent.classList.add("hidden");
 });
 
 const handleTyping = (() => {
@@ -533,11 +536,9 @@ const { appendReply, handleSend } = (() => {
 
 document.getElementById("message").addEventListener("input", handleTyping);
 
-document.getElementById("togglePopSound").addEventListener("click", () => {
-  isSoundOn = !isSoundOn;
-  document.getElementById("toggglePopSound_status").textContent = isSoundOn
-    ? "Enabled"
-    : "Disabled";
+enablePopSoundInput.checked = isSoundOn;
+enablePopSoundInput.addEventListener("change", () => {
+  isSoundOn = enablePopSoundInput.checked;
 });
 
 document
