@@ -102,25 +102,15 @@ async function flushQueueToDatabase() {
   dbWriteQueue = [];
 
   try {
-    const [error, insertedRows] = await queryService.updateMessagesBulk(batchToWrite);
+    const [error] = await queryService.updateMessagesBulk(batchToWrite);
     if (error) throw error;
     console.log(`[DB Flush] Successfully committed batch.`);
-
-    const replyUpdates = batchToWrite
-      .map((item, i) =>
-        item.replyOf ? { id: insertedRows[i].id, reply_child: item.replyOf.id } : null,
-      )
-      .filter(Boolean);
-
-    if (replyUpdates.length > 0) {
-      await queryService.updateReplies(replyUpdates);
-    }
   } catch (error) {
     console.error(
       "[DB Flush] Failed to write batch to database. Restoring queue items.",
       error,
     );
-    dbWriteQueue = [...batchToWrite, ...dbWriteQueue];
+    dbWriteQueue = [...dbWriteQueue];
   }
 }
 

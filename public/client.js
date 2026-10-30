@@ -264,7 +264,7 @@ const createChatBubble = (messageObj) => {
   // --------------------Reply code should probably go here your decision baby---
   let replyDiv = null;
 
-  if (messageObj.replyOf) {
+  if (messageObj.replyOf && typeof messageObj.replyOf !== "number") {
     replyDiv = document.createElement("a");
     replyDiv.classList.add("chatScreen_conversationContainer_chatBubble_reply");
     replyDiv.setAttribute("href", `#${messageObj.replyOf.id}`);
@@ -301,6 +301,9 @@ const createAndAppendMessage = (messages) => {
   const messagesLen = messages.length;
   if (!messagesLen) return;
   const repliesMap = {};
+  messages.forEach((msg) => {
+    if (msg.reply_child) repliesMap[msg.reply_child] = {};
+  });
   const messagesFragment = document.createDocumentFragment();
   for (let i = messagesLen - 1; i >= 0; i -= 1) {
     const currentMessage = messages[i];
@@ -486,10 +489,12 @@ logoutBtn.addEventListener("click", () => {
 
 const chatSettingsContent = document.querySelector(".chatSettings_content");
 
-document.getElementById("chatSettings_btn").addEventListener("click", (event) => {
-  event.stopPropagation();
-  chatSettingsContent.classList.toggle("hidden");
-});
+document
+  .getElementById("chatSettings_btn")
+  .addEventListener("click", (event) => {
+    event.stopPropagation();
+    chatSettingsContent.classList.toggle("hidden");
+  });
 
 document.addEventListener("click", (event) => {
   if (event.target.closest(".chatSettings")) return;
