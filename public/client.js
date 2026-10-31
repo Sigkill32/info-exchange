@@ -27,6 +27,10 @@ const urlBase64ToUint8Array = (base64String) => {
   return outputArray;
 };
 
+document
+  .getElementById("reloadChat")
+  .addEventListener("click", () => window.location.reload());
+
 function createReadableTime(utcTimestamp) {
   const date = new Date(utcTimestamp);
 
