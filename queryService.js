@@ -29,6 +29,4 @@ module.exports = {
     handleQuery(queries.getFullConversation, username, destination),
   getConversationAfter: (username, destination, lastId) =>
     handleQuery(queries.getConversationAfter, username, destination, lastId),
-  updateReplies: (replyTypeMessages) =>
-    handleQuery(queries.updateReplies, replyTypeMessages),
 };

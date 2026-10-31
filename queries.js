@@ -77,37 +77,6 @@ const updateMessagesBulk = async (messagesArray) => {
   return rows;
 };
 
-const updateReplies = async (replyTypeMessages) => {
-  if (!replyTypeMessages || replyTypeMessages.length === 0) return [];
-
-  const values = [];
-  let caseStringBuilder = "";
-  const idPlaceholders = [];
-  let index = 1;
-
-  for (const msg of replyTypeMessages) {
-    caseStringBuilder += `WHEN $${index} THEN $${index + 1} `;
-    values.push(msg.reply_child, msg.id);
-    idPlaceholders.push(`$${index}`);
-    index += 2;
-  }
-
-  const idsString = idPlaceholders.join(", ");
-
-  const queryText = `
-    UPDATE messages
-    SET reply_child = CASE id
-        ${caseStringBuilder}
-        ELSE reply_child
-    END
-    WHERE id IN (${idsString})
-    RETURNING *;
-  `;
-
-  const { rows } = await db.query(queryText, values);
-  return rows;
-};
-
 module.exports = {
   getUserConnection,
   createUserConnection,
@@ -117,5 +86,4 @@ module.exports = {
   deleteUserMessages,
   getFullConversation,
   getConversationAfter,
-  updateReplies,
 };
