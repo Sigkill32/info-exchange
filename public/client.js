@@ -303,15 +303,13 @@ const createAndAppendMessage = (messages) => {
   const repliesMap = {};
   messages.forEach((msg) => {
     if (msg.reply_child) repliesMap[msg.reply_child] = {};
+    if (repliesMap[msg.id]) repliesMap[msg.id] = msg;
   });
   const messagesFragment = document.createDocumentFragment();
   for (let i = messagesLen - 1; i >= 0; i -= 1) {
     const currentMessage = messages[i];
     if (currentMessage.reply_child && !currentMessage.replyOf) {
-      repliesMap[currentMessage.reply_child] = currentMessage;
-    }
-    if (currentMessage.id in repliesMap) {
-      currentMessage.replyOf = repliesMap[currentMessage.id];
+      currentMessage.replyOf = repliesMap[currentMessage.reply_child];
     }
     const chatBubble = createChatBubble(currentMessage);
     messagesFragment.appendChild(chatBubble);

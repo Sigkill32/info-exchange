@@ -62,7 +62,7 @@ const updateMessagesBulk = async (messagesArray) => {
       msg.source,
       msg.destination,
       msg.message,
-      msg?.reply_child?.id ?? null,
+      msg?.replyOf?.id ?? null,
     );
     index += 4;
   }
