@@ -27,6 +27,26 @@ const urlBase64ToUint8Array = (base64String) => {
   return outputArray;
 };
 
+function generateUUIDv7() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+
+  const timestamp = Date.now();
+  bytes[0] = (timestamp / 2 ** 40) & 0xff;
+  bytes[1] = (timestamp / 2 ** 32) & 0xff;
+  bytes[2] = (timestamp / 2 ** 24) & 0xff;
+  bytes[3] = (timestamp / 2 ** 16) & 0xff;
+  bytes[4] = (timestamp / 2 ** 8) & 0xff;
+  bytes[5] = timestamp & 0xff;
+  bytes[6] = (bytes[6] & 0x0f) | 0x70;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(
+    "",
+  );
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 document
   .getElementById("reloadChat")
   .addEventListener("click", () => window.location.reload());
@@ -248,7 +268,7 @@ const createChatBubble = (messageObj) => {
 
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chatScreen_conversationContainer_chatBubble");
-  chatBubble.setAttribute("id", messageObj.id);
+  chatBubble.setAttribute("id", messageObj.message_id);
   if (source_username == username)
     chatBubble.classList.add("chatBubble_incoming");
 
@@ -268,10 +288,10 @@ const createChatBubble = (messageObj) => {
   // --------------------Reply code should probably go here your decision baby---
   let replyDiv = null;
 
-  if (messageObj.replyOf && typeof messageObj.replyOf !== "number") {
+  if (messageObj.replyOf) {
     replyDiv = document.createElement("a");
     replyDiv.classList.add("chatScreen_conversationContainer_chatBubble_reply");
-    replyDiv.setAttribute("href", `#${messageObj.replyOf.id}`);
+    replyDiv.setAttribute("href", `#${messageObj.replyOf.message_id}`);
     replyDiv.textContent = messageObj.replyOf.message;
   }
   //-----------------------------------------------------------------------------
@@ -307,7 +327,7 @@ const createAndAppendMessage = (messages) => {
   const repliesMap = {};
   messages.forEach((msg) => {
     if (msg.reply_child) repliesMap[msg.reply_child] = {};
-    if (repliesMap[msg.id]) repliesMap[msg.id] = msg;
+    if (repliesMap[msg.message_id]) repliesMap[msg.message_id] = msg;
   });
   const messagesFragment = document.createDocumentFragment();
   for (let i = messagesLen - 1; i >= 0; i -= 1) {
@@ -427,6 +447,7 @@ const onStartChat = () => {
 const handleSendMessage = (replyOf = null) => {
   const messageInput = document.getElementById("message");
   const message = messageInput.value;
+  const message_id = generateUUIDv7();
 
   const userMessage = {
     message: message,
@@ -434,6 +455,7 @@ const handleSendMessage = (replyOf = null) => {
     source_username: username,
     destination_username: targetusername,
     replyOf: replyOf,
+    message_id,
   };
 
   if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -446,8 +468,9 @@ const handleSendMessage = (replyOf = null) => {
     if (isSoundOn) sendSound.play();
     socket.send(
       JSON.stringify({
-        message: message,
-        replyOf: replyOf,
+        message,
+        replyOf,
+        message_id,
       }),
     );
     createAndAppendMessage([userMessage]);

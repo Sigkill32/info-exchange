@@ -56,19 +56,28 @@ const updateMessagesBulk = async (messagesArray) => {
 
   for (const msg of messagesArray) {
     valuePlaceholders.push(
-      `($${index}, $${index + 1}, $${index + 2},  $${index + 3})`,
+      `($${index}, $${index + 1}, $${index + 2},  $${index + 3}, $${index + 4})`,
     );
     values.push(
       msg.source,
       msg.destination,
       msg.message,
-      msg?.replyOf?.id ?? null,
+      msg?.replyOf?.message_id ?? null,
+      msg.message_id,
     );
-    index += 4;
+    index += 5;
+
+    console.log(
+      msg.source,
+      msg.destination,
+      msg.message,
+      msg?.replyOf?.message_id ?? null,
+      msg.message_id,
+    );
   }
 
   const queryText = `
-    INSERT INTO messages (source_username, destination_username, message, reply_child) 
+    INSERT INTO messages (source_username, destination_username, message, reply_child, message_id) 
     VALUES ${valuePlaceholders.join(", ")} 
     RETURNING *;
   `;

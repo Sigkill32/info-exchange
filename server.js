@@ -128,6 +128,7 @@ const updateQueue = (source, destination, message) => {
     destination,
     message: message.message,
     replyOf: message.replyOf || null,
+    message_id: message.message_id,
   });
 
   if (dbWriteQueue.length >= 100) {
@@ -221,6 +222,7 @@ webSocketServer.on("connection", (ws, req) => {
           destination_username: targetusername,
           created_at: new Date().toISOString(),
           replyOf: message?.replyOf || null,
+          message_id: message.message_id,
         };
         // Recipient is online. Send message and a notification hint so a hidden tab can alert.
         connections[targetusername].send(JSON.stringify([userMessage]));
