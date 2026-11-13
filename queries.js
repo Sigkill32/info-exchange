@@ -34,10 +34,14 @@ const getUserMessages = async (username, destination) => {
   return rows;
 };
 
-const getConversationAfter = async (username, destination, lastId) => {
+const getConversationAfter = async (username, destination, lastMessageUuId) => {
   const queryText =
-    "SELECT * FROM messages WHERE (source_username IN ($1, $2) OR destination_username IN ($2, $1)) AND id > $3 ORDER BY id DESC LIMIT 200";
-  const { rows } = await db.query(queryText, [username, destination, lastId]);
+    "SELECT * FROM messages WHERE (source_username IN ($1, $2) OR destination_username IN ($2, $1)) AND id > (SELECT id FROM messages WHERE message_id = $3) ORDER BY id DESC LIMIT 200";
+  const { rows } = await db.query(queryText, [
+    username,
+    destination,
+    lastMessageUuId,
+  ]);
   return rows;
 };
 

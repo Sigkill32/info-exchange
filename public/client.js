@@ -7,6 +7,7 @@ const MAX_RECONNECT_DELAY_MS = 30_000;
 let isSoundOn = false;
 isTargetUserOnline = false;
 const sendSound = new Audio("./sounds/pop.mp3");
+let lastMessageUuId = null;
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
 const PUBLIC_VAPID_KEY =
@@ -320,6 +321,7 @@ const createChatBubble = (messageObj) => {
 };
 
 const createAndAppendMessage = (messages) => {
+  lastMessageUuId = messages[0].message_id;
   document.querySelector(".loadingOverlay").classList.add("hidden");
   const messagesLen = messages.length;
   if (!messagesLen) return;
@@ -372,7 +374,7 @@ const connectSocket = () => {
     reconnectTimer = null;
   }
 
-  let url = `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}`;
+  let url = `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}&lastMessageUuId=${lastMessageUuId}`;
 
   socket = new WebSocket(url);
 

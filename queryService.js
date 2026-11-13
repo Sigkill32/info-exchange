@@ -27,6 +27,11 @@ module.exports = {
     handleQuery(queries.deleteUserMessages, username),
   getFullConversation: (username, destination) =>
     handleQuery(queries.getFullConversation, username, destination),
-  getConversationAfter: (username, destination, lastId) =>
-    handleQuery(queries.getConversationAfter, username, destination, lastId),
+  getConversationAfter: (username, destination, lastMessageUuId) =>
+    handleQuery(
+      queries.getConversationAfter,
+      username,
+      destination,
+      lastMessageUuId,
+    ),
 };

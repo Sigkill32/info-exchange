@@ -83,8 +83,6 @@ const webSocketServer = new WebSocketServer({ server: httpServer });
 
 const connections = {};
 let dbWriteQueue = [];
-const userBasedLastSequenceId = {};
-let lastSequenceId = 0;
 
 const heartbeatInterval = setInterval(() => {
   webSocketServer.clients.forEach((ws) => {
@@ -107,7 +105,6 @@ async function flushQueueToDatabase(source) {
     const [error, data] = await queryService.updateMessagesBulk(batchToWrite);
     if (error) throw error;
     console.log(`[DB Flush] Successfully committed batch.`);
-    userBasedLastSequenceId[source] = data[data.length - 1].lastSequenceId;
   } catch (error) {
     console.error(
       "[DB Flush] Failed to write batch to database. Restoring queue items.",
@@ -150,20 +147,18 @@ webSocketServer.on("connection", (ws, req) => {
   const urlParams = myUrl.searchParams;
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
+  const lastMessageUuId = urlParams.get("lastMessageUuId");
 
-  if (
-    userBasedLastSequenceId[username] &&
-    userBasedLastSequenceId[username] > 0
-  ) {
+  if (lastMessageUuId != "null") {
+    console.log({ lastMessageUuId });
     queryService
-      .getConversationAfter(username, targetusername, lastSequenceId)
+      .getConversationAfter(username, targetusername, lastMessageUuId)
       .then((data) => {
         const [error, messages] = data;
         if (error) {
           console.log("Error fetching full conversation:", error);
           ws.send(JSON.stringify([]));
         } else {
-          userBasedLastSequenceId[username] = messages[0].id;
           ws.send(JSON.stringify(messages));
         }
       });
@@ -174,7 +169,6 @@ webSocketServer.on("connection", (ws, req) => {
         console.log("Error fetching full conversation:", error);
         ws.send(JSON.stringify([]));
       } else {
-        userBasedLastSequenceId[username] = messages[0].id;
         ws.send(JSON.stringify(messages));
       }
     });
