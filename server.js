@@ -83,6 +83,7 @@ const webSocketServer = new WebSocketServer({ server: httpServer });
 
 const connections = {};
 let dbWriteQueue = [];
+const userBasedLastSequenceId = {};
 let lastSequenceId = 0;
 
 const heartbeatInterval = setInterval(() => {
@@ -96,7 +97,7 @@ const heartbeatInterval = setInterval(() => {
   });
 }, HEARTBEAT_INTERVAL_MS);
 
-async function flushQueueToDatabase() {
+async function flushQueueToDatabase(source) {
   if (dbWriteQueue.length === 0) return;
 
   const batchToWrite = [...dbWriteQueue];
@@ -106,7 +107,7 @@ async function flushQueueToDatabase() {
     const [error, data] = await queryService.updateMessagesBulk(batchToWrite);
     if (error) throw error;
     console.log(`[DB Flush] Successfully committed batch.`);
-    lastSequenceId = data[data.length - 1].lastSequenceId;
+    userBasedLastSequenceId[source] = data[data.length - 1].lastSequenceId;
   } catch (error) {
     console.error(
       "[DB Flush] Failed to write batch to database. Restoring queue items.",
@@ -134,7 +135,7 @@ const updateQueue = (source, destination, message) => {
   });
 
   if (dbWriteQueue.length >= 100) {
-    flushQueueToDatabase();
+    flushQueueToDatabase(source);
   }
 };
 
@@ -150,7 +151,10 @@ webSocketServer.on("connection", (ws, req) => {
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
 
-  if (lastSequenceId > 0) {
+  if (
+    userBasedLastSequenceId[username] &&
+    userBasedLastSequenceId[username] > 0
+  ) {
     queryService
       .getConversationAfter(username, targetusername, lastSequenceId)
       .then((data) => {
@@ -159,6 +163,7 @@ webSocketServer.on("connection", (ws, req) => {
           console.log("Error fetching full conversation:", error);
           ws.send(JSON.stringify([]));
         } else {
+          userBasedLastSequenceId[username] = messages[0].id;
           ws.send(JSON.stringify(messages));
         }
       });
@@ -169,6 +174,7 @@ webSocketServer.on("connection", (ws, req) => {
         console.log("Error fetching full conversation:", error);
         ws.send(JSON.stringify([]));
       } else {
+        userBasedLastSequenceId[username] = messages[0].id;
         ws.send(JSON.stringify(messages));
       }
     });
