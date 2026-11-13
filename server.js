@@ -83,6 +83,7 @@ const webSocketServer = new WebSocketServer({ server: httpServer });
 
 const connections = {};
 let dbWriteQueue = [];
+let lastSequenceId = 0;
 
 const heartbeatInterval = setInterval(() => {
   webSocketServer.clients.forEach((ws) => {
@@ -102,9 +103,10 @@ async function flushQueueToDatabase() {
   dbWriteQueue = [];
 
   try {
-    const [error] = await queryService.updateMessagesBulk(batchToWrite);
+    const [error, data] = await queryService.updateMessagesBulk(batchToWrite);
     if (error) throw error;
     console.log(`[DB Flush] Successfully committed batch.`);
+    lastSequenceId = data[data.length - 1].lastSequenceId;
   } catch (error) {
     console.error(
       "[DB Flush] Failed to write batch to database. Restoring queue items.",
@@ -147,7 +149,6 @@ webSocketServer.on("connection", (ws, req) => {
   const urlParams = myUrl.searchParams;
   const username = urlParams.get("username");
   const targetusername = urlParams.get("targetusername");
-  const lastSequenceId = urlParams.get("lastSequenceId");
 
   if (lastSequenceId > 0) {
     queryService

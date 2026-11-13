@@ -4,7 +4,6 @@ let socket = null;
 let reconnectAttempt = 0;
 let reconnectTimer = null;
 const MAX_RECONNECT_DELAY_MS = 30_000;
-let lastSequenceId = -1;
 let isSoundOn = false;
 isTargetUserOnline = false;
 const sendSound = new Audio("./sounds/pop.mp3");
@@ -338,7 +337,6 @@ const createAndAppendMessage = (messages) => {
     const chatBubble = createChatBubble(currentMessage);
     messagesFragment.appendChild(chatBubble);
   }
-  if (lastSequenceId < 0) lastSequenceId = Number(messages[0].id);
   const conversationContainer = document.querySelector(
     ".chatScreen_conversationContainer",
   );
@@ -374,7 +372,7 @@ const connectSocket = () => {
     reconnectTimer = null;
   }
 
-  let url = `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}&lastSequenceId=${encodeURIComponent(lastSequenceId)}`;
+  let url = `${wsUri}?username=${encodeURIComponent(username)}&targetusername=${encodeURIComponent(targetusername)}`;
 
   socket = new WebSocket(url);
 
