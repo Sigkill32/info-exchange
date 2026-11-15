@@ -8,6 +8,7 @@ let isSoundOn = false;
 isTargetUserOnline = false;
 const sendSound = new Audio("./sounds/pop.mp3");
 let lastMessageUuId = null;
+const idToMessagesMap = {};
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
 const PUBLIC_VAPID_KEY =
@@ -300,10 +301,10 @@ const createChatBubble = (messageObj) => {
   const replyButtonClass =
     "chatScreen_conversationContainer_chatBubble_replyButton";
   replyButton.classList.add(replyButtonClass);
+  replyButton.setAttribute("id", messageObj.message_id);
   if (source_username == username)
     replyButton.classList.add(replyButtonClass + "_incoming");
   else replyButton.classList.add(replyButtonClass + "_outgoing");
-  replyButton.dataset.message = JSON.stringify(messageObj);
   replyButton.innerHTML = `
     <svg width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <g>
@@ -325,16 +326,14 @@ const createAndAppendMessage = (messages) => {
   document.querySelector(".loadingOverlay").classList.add("hidden");
   const messagesLen = messages.length;
   if (!messagesLen) return;
-  const repliesMap = {};
   messages.forEach((msg) => {
-    if (msg.reply_child) repliesMap[msg.reply_child] = {};
-    if (repliesMap[msg.message_id]) repliesMap[msg.message_id] = msg;
+    idToMessagesMap[msg.message_id] = msg;
   });
   const messagesFragment = document.createDocumentFragment();
   for (let i = messagesLen - 1; i >= 0; i -= 1) {
     const currentMessage = messages[i];
     if (currentMessage.reply_child && !currentMessage.replyOf) {
-      currentMessage.replyOf = repliesMap[currentMessage.reply_child];
+      currentMessage.replyOf = idToMessagesMap[currentMessage.reply_child];
     }
     const chatBubble = createChatBubble(currentMessage);
     messagesFragment.appendChild(chatBubble);
@@ -576,9 +575,7 @@ document
       ".chatScreen_conversationContainer_chatBubble_replyButton",
     );
     if (!replyButton) return;
-
-    const messageObj = JSON.parse(replyButton.dataset.message);
-    appendReply(messageObj);
+    appendReply(idToMessagesMap[replyButton.id]);
     document.getElementById("message").focus();
   });
 
