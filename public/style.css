@@ -158,12 +158,12 @@ body {
     border-top: 1px solid;
     border-bottom: 1px solid;
     padding: 10px;
-    height: 86%;
+    height: 83%;
     border-color: var(--secondary-color);
 }
 
 .decreaseHeight {
-    height: 79%;
+    height: 76%;
 }
 
 .chatScreen_conversationContainer::-webkit-scrollbar {
