@@ -1,7 +1,17 @@
 :root {
-    --dark-color: #000;
-    --light-color: #ECECEC;
-    --medium-color: #525252
+    --bg: #fff;
+    --primary-color: #000;
+    --secondary-color: #ECECEC;
+    --primary-passive-color: #525252;
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    --bg: #2a2a2a;
+    --primary-color: #ECECEC;
+    --secondary-color: #000;
+    --primary-passive-color: #525252;
+    color-scheme: dark;
 }
 
 *, *::before, *::after {
@@ -16,6 +26,7 @@ html {
 body {
     height: 100%;
     margin: 0;
+    background-color: var(--bg);
 }
 
 .hidden {
@@ -24,7 +35,7 @@ body {
 
 .initScreen {
     height: 100%;
-    background-color: var(--dark-color);
+    background-color: var(--primary-color);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -34,7 +45,7 @@ body {
 .initScreen_internal {
     margin-top: 20vh;
     height: 100%;
-    background-color: var(--light-color);
+    background-color: var(--secondary-color);
     width: 100%;
     padding: 125px 50px;
     border-top-left-radius: 120px;
@@ -57,11 +68,12 @@ body {
         border: none;
         border-radius: 20px;
         padding: 20px;
+        text-align: center;
     }
 
     button {
-        background-color: var(--dark-color);
-        color: var(--light-color);
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
         border: none;
         border-radius: 20px;
         padding: 10px;
@@ -82,7 +94,7 @@ body {
 .chatScreen_inputcontainer_external_replycontainer {
     position: relative;
     margin: 15px 15px 0;
-    background: var(--light-color);
+    background: var(--secondary-color);
     padding: 5px;
     border-radius: 5px 5px 0 0;
 }
@@ -100,14 +112,14 @@ body {
 .chatScreen_inputcontainer_external_replycontainer_replyToUserName {
     font-size: 10px;
     padding: 5px;
-    border-left: 5px solid var(--dark-color);
+    border-left: 5px solid var(--primary-color);
     text-wrap: wrap;
     overflow-wrap: anywhere;
 }
 
 .chatScreen_inputcontainer_external_replycontainer_replyToMessage {
     padding: 5px;
-    border-left: 5px solid var(--dark-color);
+    border-left: 5px solid var(--primary-color);
 }
 
 .chatScreen_inputcontainer {
@@ -118,17 +130,16 @@ body {
     flex: auto;
     input {
         width: 80%;
-        border: 2px solid var(--light-color);
-        background-color: #F8FAFC;
+        border: 2px solid var(--primary-color);
         border-radius: 20px 0 0 20px;
         padding: 10px;
         border-right: none;
     }
     button {
        width: 20%;
-        background-color: var(--dark-color);
+        background-color: var(--primary-color);
         border: transparent;
-        color: white;
+        color: var(--secondary-color);
         border-radius: 0 20px 20px 0;
     }
 }
@@ -147,12 +158,12 @@ body {
     border-top: 1px solid;
     border-bottom: 1px solid;
     padding: 10px;
-    height: 83%;
-    border-color: var(--light-color);
+    height: 86%;
+    border-color: var(--secondary-color);
 }
 
 .decreaseHeight {
-    height: 76%;
+    height: 79%;
 }
 
 .chatScreen_conversationContainer::-webkit-scrollbar {
@@ -168,7 +179,7 @@ body {
     display: inline-block;
     max-width: 90%;
     min-width: 60%;
-    background-color: var(--light-color);
+    background-color: var(--secondary-color);
     border-color: transparent;
     border-top-left-radius: 0;
 }
@@ -193,6 +204,7 @@ body {
     border: none;
     cursor: pointer;
     padding: 0;
+    color: var(--primary-color);
 }
 
 .chatScreen_conversationContainer_chatBubble_replyButton_outgoing {
@@ -213,7 +225,6 @@ body {
 #statusBar {
     margin:4px 0;
     font-size:0.8em;
-    color:#888;
     text-align:center;
     display: none;
 }
@@ -238,10 +249,11 @@ body {
     justify-content: center;
     width: 100%;
     height: 100%;
-    background-color: var(--light-color);
+    background-color: var(--secondary-color);
 
     span {
         animation: spin 3s linear infinite;
+        color: var(--primary-color);
     }
 }
 
@@ -254,7 +266,7 @@ body {
 }
 
 .chatBubble_incoming {
-    background-color: #525252;
+    background-color: var(--primary-passive-color);
     color: white;
     border-top-left-radius: 12px;
     border-top-right-radius: 0;
@@ -282,8 +294,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background: #fff;
-    border: 1px solid var(--light-color);
+    background: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
@@ -296,7 +308,7 @@ body {
 
     input {
         margin: 0;
-        accent-color: var(--dark-color);
+        accent-color: var(--primary-color);
     }
 }
 
@@ -305,14 +317,14 @@ body {
     padding: 8px 10px;
     border: none;
     border-radius: 8px;
-    background: var(--dark-color);
-    color: #fff;
+    background: var(--primary-color);
+    color: var(--secondary-color);
     cursor: pointer;
 }
 
 .chatScreen_statuscontianer {
     display: flex;
-    background-color: #F8FAFC;
+    background-color: var(--bg);
     padding: 0 15px;
     justify-content: space-between;
 }
@@ -332,9 +344,9 @@ body {
 .chatScreen_conversationContainer_chatBubble_reply {
     margin-top: 20px;
     display: block;
-    color: white;
+    color: var(--primary-color);
     text-decoration: none;
-    background-color: black;
+    background-color: var(--bg);
     padding: 5px;
     border-radius: 5px;
 }

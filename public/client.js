@@ -134,6 +134,9 @@ const startChatting = document.getElementById("startChatting");
 const sendMessage = document.getElementById("sendMessage");
 const enableNotificationsInput = document.getElementById("enableNotifications");
 const enablePopSoundInput = document.getElementById("enablePopSound");
+const enableDarkThemeInput = document.getElementById("enableDarkTheme");
+const root = document.documentElement;
+const storedTheme = localStorage.getItem("theme") || "light";
 
 const updateNotificationButton = () => {
   if (!("Notification" in window)) {
@@ -200,6 +203,13 @@ enableNotificationsInput.addEventListener("change", () => {
       configurePushSubscription(username);
     }
   });
+});
+
+root.dataset.theme = storedTheme;
+enableDarkThemeInput.checked = storedTheme === "dark";
+enableDarkThemeInput.addEventListener("change", () => {
+  root.dataset.theme = enableDarkThemeInput.checked ? "dark" : "light";
+  localStorage.setItem("theme", root.dataset.theme);
 });
 
 const removeReplyPreview = () => {
@@ -308,7 +318,7 @@ const createChatBubble = (messageObj) => {
   replyButton.innerHTML = `
     <svg width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <g>
-        <path d="M9 16h7.2l-2.6 2.6L15 20l5-5-5-5-1.4 1.4 2.6 2.6H9c-2.2 0-4-1.8-4-4s1.8-4 4-4h2V4H9c-3.3 0-6 2.7-6 6s2.7 6 6 6z"/>
+        <path fill="currentColor" d="M9 16h7.2l-2.6 2.6L15 20l5-5-5-5-1.4 1.4 2.6 2.6H9c-2.2 0-4-1.8-4-4s1.8-4 4-4h2V4H9c-3.3 0-6 2.7-6 6s2.7 6 6 6z"/>
       </g>
     </svg>
   `;
@@ -356,7 +366,6 @@ const setOnlineStatus = (data) => {
     targetUser.style.color = "green";
     isTargetUserOnline = true;
   } else {
-    targetUser.style.color = "black";
     isTargetUserOnline = false;
   }
 };
