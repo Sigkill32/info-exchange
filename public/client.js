@@ -366,6 +366,8 @@ const setOnlineStatus = (data) => {
     targetUser.style.color = "green";
     isTargetUserOnline = true;
   } else {
+    targetUser.style.color =
+      localStorage.getItem("theme") == "dark" ? "white" : "black";
     isTargetUserOnline = false;
   }
 };
