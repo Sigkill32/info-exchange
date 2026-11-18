@@ -373,7 +373,7 @@ const setOnlineStatus = (data) => {
 const setTypingStatus = (data) => {
   const typingStatus = document.getElementById("typingStatus");
   if (data.status == "START") typingStatus.textContent = "typing...";
-  else typingStatus.textContent = "-";
+  else typingStatus.textContent = "...";
 };
 
 const connectSocket = () => {
