@@ -9,6 +9,8 @@ isTargetUserOnline = false;
 const sendSound = new Audio("./sounds/pop.mp3");
 let lastMessageUuId = null;
 const idToMessagesMap = {};
+const foundIds = [];
+let currentFoundIndex = -1;
 
 // ADD YOUR PUBLIC VAPID KEY HERE (Generated from backend setup)
 const PUBLIC_VAPID_KEY =
@@ -46,6 +48,16 @@ function generateUUIDv7() {
     "",
   );
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function navigateAndHighlightChatBubble() {
+  window.location.hash = foundIds[currentFoundIndex];
+  document.getElementById(foundIds[currentFoundIndex]).style.border =
+    "3px solid red";
+}
+
+function removeHighlight(index) {
+  document.getElementById(foundIds[index]).style.border = "none";
 }
 
 document
@@ -483,6 +495,7 @@ const handleSendMessage = (replyOf = null) => {
         message_id,
       }),
     );
+    idToMessagesMap[message_id] = userMessage;
     createAndAppendMessage([userMessage]);
     messageInput.value = "";
     return true;
@@ -597,6 +610,53 @@ document
       handleSend();
     }
   });
+
+document
+  .querySelector(".chatScreen_searchContainer_search_button")
+  .addEventListener("click", () => {
+    foundIds.length = 0;
+    currentFoundIndex = -1;
+    const searchStr = document.getElementById("searchStr").value;
+    Object.keys(idToMessagesMap).forEach((msgId) => {
+      const found = idToMessagesMap[msgId].message
+        .toLowerCase()
+        .includes(searchStr.toLowerCase());
+      if (found) foundIds.push(msgId);
+    });
+    currentFoundIndex = foundIds.length - 1;
+    navigateAndHighlightChatBubble();
+  });
+
+document
+  .querySelector(".chatScreen_searchContainer_closeButton")
+  .addEventListener("click", () => {
+    document
+      .querySelector(".chatScreen_searchContainer")
+      .classList.add("hidden");
+    removeHighlight(currentFoundIndex);
+  });
+
+document.querySelector("#searchButton").addEventListener("click", () => {
+  document
+    .querySelector(".chatScreen_searchContainer")
+    .classList.remove("hidden");
+});
+
+document.getElementById("prev").addEventListener("click", () => {
+  if (foundIds.length == 0) return;
+  removeHighlight(currentFoundIndex);
+  if (currentFoundIndex == 0) currentFoundIndex = foundIds.length - 1;
+  else currentFoundIndex -= 1;
+  navigateAndHighlightChatBubble();
+});
+
+document.getElementById("next").addEventListener("click", () => {
+  if (foundIds.length == 0) return;
+  removeHighlight(currentFoundIndex);
+  if (currentFoundIndex == foundIds.length - 1) currentFoundIndex = 0;
+  else currentFoundIndex += 1;
+  navigateAndHighlightChatBubble();
+});
 
 sendMessage.addEventListener("click", handleSend);
 startChatting.addEventListener("click", onStartChat);

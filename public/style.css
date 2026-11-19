@@ -353,6 +353,26 @@ body {
     overflow-wrap: anywhere;
 }
 
+.chatScreen_searchContainer_search {
+    width: 100%;
+    display: flex;
+}
+
+.chatScreen_searchContainer_search_input {
+    flex-grow: 1;
+}
+
+.chatScreen_searchContainer_closeButton {
+    width: 100%;
+}
+
+.chatScreen_searchContainer_nav {
+    display: flex;
+    button {
+        width: 50%;
+    }
+}
+
 @keyframes spin {
     from {
       transform: rotate(0deg);
