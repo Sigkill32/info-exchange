@@ -349,6 +349,8 @@ body {
     background-color: var(--bg);
     padding: 5px;
     border-radius: 5px;
+    text-wrap: wrap;
+    overflow-wrap: anywhere;
 }
 
 @keyframes spin {
