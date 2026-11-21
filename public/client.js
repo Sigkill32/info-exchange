@@ -630,7 +630,7 @@ document
   });
 
 document
-  .querySelector(".chatScreen_searchContainer_search_button")
+  .querySelector(".chatScreen_searchContainer_button")
   .addEventListener("click", () => {
     foundIds.length = 0;
     currentFoundIndex = -1;

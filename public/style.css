@@ -353,17 +353,30 @@ body {
     overflow-wrap: anywhere;
 }
 
-.chatScreen_searchContainer_search {
-    width: 100%;
+.chatScreen_searchContainer {
     display: flex;
+    width: 100%;
+    border: 1px solid;
+    button {
+        background-color: transparent;
+        border: none;
+    }
+    padding: 5px;
 }
 
-.chatScreen_searchContainer_search_input {
+.chatScreen_searchContainer_input {
+    border: none;
     flex-grow: 1;
+    outline: none;
+    margin-left: 5px;
 }
 
 .chatScreen_searchContainer_closeButton {
-    width: 100%;
+    width: 10px;
+    text-align: center;
+    border: none;
+    margin: 0;
+    padding: 0;
 }
 
 .chatScreen_searchContainer_nav {
