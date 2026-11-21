@@ -356,10 +356,15 @@ body {
 .chatScreen_searchContainer {
     display: flex;
     width: 100%;
-    border: 1px solid;
+    border: 2px solid;
+    border-radius: 5px;
     button {
         background-color: transparent;
-        border: none;
+        border: 1px solid;
+        border-radius: 5px;
+        height: 25px;
+        width: 25px;
+        margin-right: 5px;
     }
     padding: 5px;
 }
@@ -368,7 +373,13 @@ body {
     border: none;
     flex-grow: 1;
     outline: none;
-    margin-left: 5px;
+    background-color: transparent;
+}
+
+.chatScreen_searchContainer_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .chatScreen_searchContainer_closeButton {
@@ -381,9 +392,6 @@ body {
 
 .chatScreen_searchContainer_nav {
     display: flex;
-    button {
-        width: 50%;
-    }
 }
 
 @keyframes spin {
