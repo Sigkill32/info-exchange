@@ -50,6 +50,22 @@ function generateUUIDv7() {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
+function searchForPattern(str, pattern) {
+  let curr = 0;
+  let foundCount = 0;
+  for (let i = 0; i < pattern.length; i++) {
+    while (curr < str.length) {
+      if (pattern[i] == str[curr]) {
+        foundCount += 1;
+        curr += 1;
+        break;
+      }
+      curr += 1;
+    }
+  }
+  return foundCount == pattern.length;
+}
+
 function navigateAndHighlightChatBubble() {
   window.location.hash = foundIds[currentFoundIndex];
   document.getElementById(foundIds[currentFoundIndex]).style.border =
@@ -438,7 +454,9 @@ const connectSocket = () => {
     }
   };
 
-  socket.onerror = () => {};
+  socket.onerror = (event) => {
+    console.error("SOCKET ERROR:", event);
+  };
 
   socket.onclose = (event) => {
     if (event.wasClean) {
@@ -618,9 +636,10 @@ document
     currentFoundIndex = -1;
     const searchStr = document.getElementById("searchStr").value;
     Object.keys(idToMessagesMap).forEach((msgId) => {
-      const found = idToMessagesMap[msgId].message
-        .toLowerCase()
-        .includes(searchStr.toLowerCase());
+      const found = searchForPattern(
+        idToMessagesMap[msgId].message.toLowerCase(),
+        searchStr.toLowerCase(),
+      );
       if (found) foundIds.push(msgId);
     });
     currentFoundIndex = foundIds.length - 1;
@@ -640,6 +659,7 @@ document.querySelector("#searchButton").addEventListener("click", () => {
   document
     .querySelector(".chatScreen_searchContainer")
     .classList.remove("hidden");
+  chatSettingsContent.classList.add("hidden");
 });
 
 document.getElementById("prev").addEventListener("click", () => {
