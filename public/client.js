@@ -51,19 +51,27 @@ function generateUUIDv7() {
 }
 
 function searchForPattern(str, pattern) {
-  let curr = 0;
-  let foundCount = 0;
-  for (let i = 0; i < pattern.length; i++) {
-    while (curr < str.length) {
-      if (pattern[i] == str[curr]) {
-        foundCount += 1;
+  function fuzzySearch(word) {
+    let curr = 0;
+    let foundCount = 0;
+    for (let i = 0; i < pattern.length; i++) {
+      while (curr < word.length) {
+        if (pattern[i] == word[curr]) {
+          foundCount += 1;
+          curr += 1;
+          break;
+        }
         curr += 1;
-        break;
       }
-      curr += 1;
     }
+    return foundCount == pattern.length;
   }
-  return foundCount == pattern.length;
+
+  const words = str.trim().split(/\s+/);
+  for (let i = 0; i < words.length; i++) {
+    if (fuzzySearch(words[i])) return true;
+  }
+  return false;
 }
 
 function navigateAndHighlightChatBubble() {
