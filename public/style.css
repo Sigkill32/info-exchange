@@ -182,6 +182,11 @@ body {
     background-color: var(--secondary-color);
     border-color: transparent;
     border-top-left-radius: 0;
+
+    mark {
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+    }
 }
 
 .chatScreen_conversationContainer_chatBubble_source {

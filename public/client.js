@@ -54,34 +54,56 @@ function searchForPattern(str, pattern) {
   function fuzzySearch(word) {
     let curr = 0;
     let foundCount = 0;
+    let foundIndexes = [];
     for (let i = 0; i < pattern.length; i++) {
       while (curr < word.length) {
         if (pattern[i] == word[curr]) {
           foundCount += 1;
           curr += 1;
+          foundIndexes.push(curr);
           break;
         }
         curr += 1;
       }
     }
-    return foundCount == pattern.length;
+    return {
+      isFound: foundCount == pattern.length,
+      foundIndexes: foundIndexes,
+    }
   }
 
   const words = str.trim().split(/\s+/);
   for (let i = 0; i < words.length; i++) {
-    if (fuzzySearch(words[i])) return true;
+    const { isFound, foundIndexes } = fuzzySearch(words[i]);
+    if (isFound) {
+      return {
+        foundIndexes,
+        wordStartIndex: i,
+      };
+    }
   }
-  return false;
+  return null;
 }
 
 function navigateAndHighlightChatBubble() {
-  window.location.hash = foundIds[currentFoundIndex];
-  document.getElementById(foundIds[currentFoundIndex]).style.border =
-    "3px solid red";
+  const { msgId, foundIndexes, wordStartIndex } = foundIds[currentFoundIndex];
+  window.location.hash = msgId;
+  const messageContainer = document.getElementById(msgId);
+  const messageElement = messageContainer.querySelector(".chatScreen_conversationContainer_chatBubble_message");
+  messageContainer.style.border = "3px solid white";
+  const marks = new Set(foundIndexes.map((index) => wordStartIndex + index - 1));
+  messageElement.innerHTML = 
+  [...messageElement.innerText]
+    .map((char, index) => (marks.has(index) ? `<mark>${char}</mark>` : char))
+    .join("");
 }
 
 function removeHighlight(index) {
-  document.getElementById(foundIds[index]).style.border = "none";
+  const { msgId } = foundIds[index];
+  const messageContainer = document.getElementById(msgId);
+  const messageElement = messageContainer.querySelector(".chatScreen_conversationContainer_chatBubble_message");
+  messageContainer.style.border = "none";
+  messageElement.innerHTML = messageElement.innerText;
 }
 
 document
@@ -640,15 +662,24 @@ document
 document
   .querySelector(".chatScreen_searchContainer_button")
   .addEventListener("click", () => {
+    if (currentFoundIndex !== -1) {
+      removeHighlight(currentFoundIndex);
+    }
     foundIds.length = 0;
     currentFoundIndex = -1;
     const searchStr = document.getElementById("searchStr").value;
     Object.keys(idToMessagesMap).forEach((msgId) => {
-      const found = searchForPattern(
+      const foundData = searchForPattern(
         idToMessagesMap[msgId].message.toLowerCase(),
         searchStr.toLowerCase(),
       );
-      if (found) foundIds.push(msgId);
+      if (foundData) {
+        foundIds.push({
+          msgId,
+          foundIndexes: foundData.foundIndexes,
+          wordStartIndex: foundData.wordStartIndex,
+        });
+      }
     });
     currentFoundIndex = foundIds.length - 1;
     navigateAndHighlightChatBubble();
@@ -657,6 +688,7 @@ document
 document
   .querySelector(".chatScreen_searchContainer_closeButton")
   .addEventListener("click", () => {
+    document.getElementById("searchStr").value = "";
     document
       .querySelector(".chatScreen_searchContainer")
       .classList.add("hidden");
