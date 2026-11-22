@@ -683,8 +683,7 @@ document
         });
       }
     });
-    console.log("here", {idToMessagesMap: Object.keys(idToMessagesMap), foundIds, currentFoundIndex})
-    currentFoundIndex = foundIds.length - 1;
+    currentFoundIndex = 0;
     navigateAndHighlightChatBubble();
   });
 
@@ -705,7 +704,7 @@ document.querySelector("#searchButton").addEventListener("click", () => {
   chatSettingsContent.classList.add("hidden");
 });
 
-document.getElementById("prev").addEventListener("click", () => {
+document.getElementById("next").addEventListener("click", () => {
   if (foundIds.length == 0) return;
   removeHighlight(currentFoundIndex);
   if (currentFoundIndex == 0) currentFoundIndex = foundIds.length - 1;
@@ -713,7 +712,7 @@ document.getElementById("prev").addEventListener("click", () => {
   navigateAndHighlightChatBubble();
 });
 
-document.getElementById("next").addEventListener("click", () => {
+document.getElementById("prev").addEventListener("click", () => {
   if (foundIds.length == 0) return;
   removeHighlight(currentFoundIndex);
   if (currentFoundIndex == foundIds.length - 1) currentFoundIndex = 0;
