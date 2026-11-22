@@ -73,14 +73,16 @@ function searchForPattern(str, pattern) {
   }
 
   const words = str.trim().split(/\s+/);
+  let presentStringLength = 0;
   for (let i = 0; i < words.length; i++) {
     const { isFound, foundIndexes } = fuzzySearch(words[i]);
     if (isFound) {
       return {
         foundIndexes,
-        wordStartIndex: i,
+        wordStartIndex: presentStringLength,
       };
     }
+    presentStringLength += words[i].length + 1; // +1 for the space
   }
   return null;
 }
@@ -681,6 +683,7 @@ document
         });
       }
     });
+    console.log("here", {idToMessagesMap: Object.keys(idToMessagesMap), foundIds, currentFoundIndex})
     currentFoundIndex = foundIds.length - 1;
     navigateAndHighlightChatBubble();
   });
