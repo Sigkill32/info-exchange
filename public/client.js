@@ -93,11 +93,12 @@ function navigateAndHighlightChatBubble() {
   const messageContainer = document.getElementById(msgId);
   const messageElement = messageContainer.querySelector(".chatScreen_conversationContainer_chatBubble_message");
   messageContainer.style.border = "3px solid white";
-  const marks = new Set(foundIndexes.map((index) => wordStartIndex + index - 1));
-  messageElement.innerHTML = 
-  [...messageElement.innerText]
-    .map((char, index) => (marks.has(index) ? `<mark>${char}</mark>` : char))
-    .join("");
+  let msgText = [...messageElement.innerText];
+  for(let i = 0; i < foundIndexes.length; i++) {
+    const actualIndex = foundIndexes[i] + wordStartIndex - 1;
+    msgText[actualIndex] = `<mark>${msgText[actualIndex]}</mark>`;
+  }
+  messageElement.innerHTML = msgText.join("");
 }
 
 function removeHighlight(index) {
