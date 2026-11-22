@@ -150,7 +150,6 @@ webSocketServer.on("connection", (ws, req) => {
   const lastMessageUuId = urlParams.get("lastMessageUuId");
 
   if (lastMessageUuId != "null") {
-    console.log({ lastMessageUuId });
     queryService
       .getConversationAfter(username, targetusername, lastMessageUuId)
       .then((data) => {

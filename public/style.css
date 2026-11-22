@@ -357,7 +357,8 @@ body {
     display: flex;
     width: 100%;
     border: 2px solid;
-    border-radius: 5px;
+    border-left: 0;
+    border-right: 0;
     button {
         background-color: transparent;
         border: 1px solid;
