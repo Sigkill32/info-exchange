@@ -345,7 +345,7 @@ function detectLinks(text) {
   function getLinkIndices(type) {
     const indices = [startIndices[type]];
     let i = startIndices[type];
-    while (text[i] == " " || i < text.length) {
+    while (text[i] !== " " && i < text.length) {
       i += 1;
     }
     indices.push(i);
@@ -372,6 +372,8 @@ function detectLinks(text) {
       "</a>" +
       text.slice(indices[1]);
   }
+
+  console.log(finalInnerHTMLText);
 
   return finalInnerHTMLText;
 }
