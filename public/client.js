@@ -69,7 +69,7 @@ function searchForPattern(str, pattern) {
     return {
       isFound: foundCount == pattern.length,
       foundIndexes: foundIndexes,
-    }
+    };
   }
 
   const words = str.trim().split(/\s+/);
@@ -91,10 +91,12 @@ function navigateAndHighlightChatBubble() {
   const { msgId, foundIndexes, wordStartIndex } = foundIds[currentFoundIndex];
   window.location.hash = msgId;
   const messageContainer = document.getElementById(msgId);
-  const messageElement = messageContainer.querySelector(".chatScreen_conversationContainer_chatBubble_message");
+  const messageElement = messageContainer.querySelector(
+    ".chatScreen_conversationContainer_chatBubble_message",
+  );
   messageContainer.style.border = "3px solid white";
   let msgText = [...messageElement.innerText];
-  for(let i = 0; i < foundIndexes.length; i++) {
+  for (let i = 0; i < foundIndexes.length; i++) {
     const actualIndex = foundIndexes[i] + wordStartIndex - 1;
     msgText[actualIndex] = `<mark>${msgText[actualIndex]}</mark>`;
   }
@@ -104,7 +106,9 @@ function navigateAndHighlightChatBubble() {
 function removeHighlight(index) {
   const { msgId } = foundIds[index];
   const messageContainer = document.getElementById(msgId);
-  const messageElement = messageContainer.querySelector(".chatScreen_conversationContainer_chatBubble_message");
+  const messageElement = messageContainer.querySelector(
+    ".chatScreen_conversationContainer_chatBubble_message",
+  );
   messageContainer.style.border = "none";
   messageElement.innerHTML = messageElement.innerText;
 }
@@ -331,6 +335,47 @@ const appendReplyMessage = (messageObj, onClose) => {
   inputcontainerExternal.prepend(replyChatBubbleContainer);
 };
 
+function detectLinks(text) {
+  const linkStarter = ["https://", "http://"];
+  const startIndices = [
+    text.indexOf(linkStarter[0]),
+    text.indexOf(linkStarter[1]),
+  ];
+
+  function getLinkIndices(type) {
+    const indices = [startIndices[type]];
+    let i = startIndices[type];
+    while (text[i] == " " || i < text.length) {
+      i += 1;
+    }
+    indices.push(i);
+    return indices;
+  }
+
+  let indices;
+
+  if (startIndices[0] > -1) {
+    indices = getLinkIndices(0);
+  }
+
+  if (startIndices[1] > -1) {
+    indices = getLinkIndices(1);
+  }
+
+  let finalInnerHTMLText = text;
+
+  if (indices && indices.length == 2) {
+    finalInnerHTMLText =
+      text.slice(0, indices[0]) +
+      `<a href="${text.substring(...indices)}" target="_blank" rel="noopener noreferrer">` +
+      text.substring(...indices) +
+      text.slice(indices[1]) +
+      "</a>";
+  }
+
+  return finalInnerHTMLText;
+}
+
 const createChatBubble = (messageObj) => {
   const { source_username, message, created_at } = messageObj;
 
@@ -354,7 +399,7 @@ const createChatBubble = (messageObj) => {
   mesageElement.classList.add(
     "chatScreen_conversationContainer_chatBubble_message",
   );
-  mesageElement.textContent = message;
+  mesageElement.innerHTML = detectLinks(message);
 
   // --------------------throw away test code-----------------------------------
   // --------------------Reply code should probably go here your decision baby---
