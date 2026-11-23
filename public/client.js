@@ -104,6 +104,7 @@ function navigateAndHighlightChatBubble() {
 }
 
 function removeHighlight(index) {
+  if (!foundIds.length) return;
   const { msgId } = foundIds[index];
   const messageContainer = document.getElementById(msgId);
   const messageElement = messageContainer.querySelector(
@@ -372,8 +373,6 @@ function detectLinks(text) {
       "</a>" +
       text.slice(indices[1]);
   }
-
-  console.log(finalInnerHTMLText);
 
   return finalInnerHTMLText;
 }
@@ -751,6 +750,7 @@ document.querySelector("#searchButton").addEventListener("click", () => {
     .querySelector(".chatScreen_searchContainer")
     .classList.remove("hidden");
   chatSettingsContent.classList.add("hidden");
+  document.querySelector("#searchStr").focus();
 });
 
 document.getElementById("next").addEventListener("click", () => {
