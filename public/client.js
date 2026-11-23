@@ -396,6 +396,12 @@ const showStatus = (msg) => {
   bar.textContent = msg;
 };
 
+const setTypingStatus = (data) => {
+  const typingStatus = document.getElementById("typingStatus");
+  if (data.status == "START") typingStatus.textContent = "typing...";
+  else typingStatus.textContent = "...";
+};
+
 const setOnlineStatus = (data) => {
   const targetUser = document.getElementById("targetUserNameTitle");
   if (data.users.includes(targetusername)) {
@@ -405,13 +411,8 @@ const setOnlineStatus = (data) => {
     targetUser.style.color =
       localStorage.getItem("theme") == "dark" ? "white" : "black";
     isTargetUserOnline = false;
+    setTypingStatus({ status: "STOP" });
   }
-};
-
-const setTypingStatus = (data) => {
-  const typingStatus = document.getElementById("typingStatus");
-  if (data.status == "START") typingStatus.textContent = "typing...";
-  else typingStatus.textContent = "...";
 };
 
 const connectSocket = () => {
