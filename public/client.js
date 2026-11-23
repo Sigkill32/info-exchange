@@ -367,10 +367,10 @@ function detectLinks(text) {
   if (indices && indices.length == 2) {
     finalInnerHTMLText =
       text.slice(0, indices[0]) +
-      `<a href="${text.substring(...indices)}" target="_blank" rel="noopener noreferrer">` +
+      `<a href="${text.substring(...indices)}">` +
       text.substring(...indices) +
-      text.slice(indices[1]) +
-      "</a>";
+      "</a>" +
+      text.slice(indices[1]);
   }
 
   return finalInnerHTMLText;
